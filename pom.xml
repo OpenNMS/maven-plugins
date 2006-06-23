@@ -4,7 +4,7 @@
   <artifactId>assembly-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>OpenNMS Assembly Plugin</name>
-  <version>1.0-alpha1</version>
+  <version>1.0-alpha1-SNAPSHOT</version>
   <description>A plugin that produces an assembly as the main packaging artifact</description>
   <scm>
     <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/assembly-maven-plugin/assembly-maven-plugin-1.0-alpha1</connection>
@@ -17,7 +17,7 @@
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <tagBase>
-            https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/assembly-maven-plugin
+            https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags
           </tagBase>
         </configuration>
       </plugin>

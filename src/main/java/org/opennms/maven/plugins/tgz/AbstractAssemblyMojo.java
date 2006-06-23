@@ -1,4 +1,4 @@
-package org.opennms.maven.plugins.assembly;
+package org.opennms.maven.plugins.tgz;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

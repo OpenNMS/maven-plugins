@@ -1,4 +1,4 @@
-package org.opennms.maven.plugins.assembly;
+package org.opennms.maven.plugins.tgz;
 
 import java.io.File;
 

@@ -4,12 +4,12 @@
   <artifactId>tgz-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>OpenNMS TGZ Packaging Plugin</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <description>A plugin that produces a tar.gz assembly as the main packaging artifact</description>
   <scm>
-    <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/tgz-maven-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/tgz-maven-plugin</developerConnection>
-    <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/tgz-maven-plugin</url>
+    <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/tgz-maven-plugin-1.0</connection>
+    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/tgz-maven-plugin-1.0</developerConnection>
+    <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/tgz-maven-plugin-1.0</url>
   </scm>
   <build>
     <plugins>

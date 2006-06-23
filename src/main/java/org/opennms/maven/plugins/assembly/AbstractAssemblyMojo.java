@@ -1494,6 +1494,23 @@ public abstract class AbstractAssemblyMojo
                 tarArchiver.setLongfile( tarFileMode );
             }
         }
+        else if ( "tgz".equals( format ) )
+        {
+            TarArchiver tarArchiver = (TarArchiver) this.archiverManager.getArchiver( "tar" );
+            archiver = tarArchiver;
+	    
+	    TarArchiver.TarCompressionMethod tarCompressionMethod = new TarArchiver.TarCompressionMethod();
+	    tarCompressionMethod.setValue( "gzip" );
+
+	    tarArchiver.setCompression( tarCompressionMethod );
+
+	    TarLongFileMode tarFileMode = new TarLongFileMode();
+
+	    tarFileMode.setValue( tarLongFileMode );
+
+	    tarArchiver.setLongfile( tarFileMode );
+
+        }
         else if ( "war".equals( format ) )
         {
             WarArchiver warArchiver = (WarArchiver) this.archiverManager.getArchiver( "war" );

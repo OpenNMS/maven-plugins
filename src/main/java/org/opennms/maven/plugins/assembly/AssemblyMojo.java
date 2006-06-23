@@ -8,8 +8,9 @@ import org.apache.maven.project.MavenProject;
 /**
  * Set the main artifact for a plugin
  * 
- * @goal assembly
+ * @goal tgz
  * @phase package
+ * @requiresProject
  * @author <a href="brozow@opennms.org">Matt Brozowski</a>
  * @version $Id$
  */

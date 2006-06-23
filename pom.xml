@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.maven.plugins</groupId>
-  <artifactId>assembly-maven-plugin</artifactId>
+  <artifactId>tgz-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>OpenNMS Assembly Plugin</name>
-  <version>1.0-alpha3-SNAPSHOT</version>
-  <description>A plugin that produces an assembly as the main packaging artifact</description>
+  <name>OpenNMS TGZ Packaging Plugin</name>
+  <version>1.0-alpha1-SNAPSHOT</version>
+  <description>A plugin that produces a tar.gz assembly as the main packaging artifact</description>
   <scm>
-    <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/assembly-maven-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/assembly-maven-plugin</developerConnection>
-    <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/assembly-maven-plugin</url>
+    <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/tgz-maven-plugin</connection>
+    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/tgz-maven-plugin</developerConnection>
+    <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/tgz-maven-plugin</url>
   </scm>
   <build>
     <plugins>

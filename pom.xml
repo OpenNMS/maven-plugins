@@ -3,16 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.maven.plugins</groupId>
   <artifactId>opennms-docbook-plugin</artifactId>
-  <version>1.70.1-SNAPSHOT</version>
+  <version>1.70.1</version>
   <packaging>maven-plugin</packaging>
   <name>OpenNMS Generated DocBook Plugin</name>
   <description>
     A Maven plugin for generating HTML from DocBook.
   </description>
   <scm>
-    <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/opennms-docbook-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/opennms-docbook-plugin</developerConnection>
-    <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/opennms-docbook-plugin</url>
+    <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/opennms-docbook-plugin-1.70.1</connection>
+    <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/opennms-docbook-plugin-1.70.1</developerConnection>
+    <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/opennms-docbook-plugin-1.70.1</url>
   </scm>
   <dependencies>
     <dependency>

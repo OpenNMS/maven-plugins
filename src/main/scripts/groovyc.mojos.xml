@@ -2,6 +2,7 @@
   <mojos>
     <mojo>
       <goal>compile</goal>
+      <phase>compile</phase>
         
       <!-- this element refers to the Ant target we'll invoke -->
       <call>groovyc</call>
@@ -47,6 +48,7 @@
 
     <mojo>
       <goal>test-compile</goal>
+      <phase>test-compile</phase>
 
       <!-- this element refers to the Ant target we'll invoke -->
       <call>groovyc</call>

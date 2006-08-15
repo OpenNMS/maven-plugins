@@ -1,6 +1,8 @@
 <project>
+
   <target name="groovyc">
 
+  	<!-- make sure class path is setup -->
     <script language="groovy">
       import org.apache.tools.ant.types.Path
       import org.codehaus.plexus.util.StringUtils
@@ -13,14 +15,41 @@
       project.addReference("classpath", path);
 
     </script>
- 
+  	
+  	<!-- define the groovyc task -->
     <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
       <classpath refid="classpath"/>
     </taskdef>
-    <mkdir dir="${destDir}"/>
-    <groovyc destdir="${destDir}" srcdir="${srcDir}" listfiles="true">
-      <classpath refid="classpath"/>
-    </groovyc>
+  	
+  	<!-- define an 'if' task that will allow me to execute only if a property is not set -->
+    <scriptdef name="if" language="groovy">
+      <attribute name="property"/>
+      <element name="then" className="org.apache.tools.ant.taskdefs.Sequential" />
+      <![CDATA[
+
+    	String propName = attributes.get("property")
+    	String propValue = project.getProperty(propName)
+    	
+    	if (propValue != null && !"".equals(propValue)) {
+    		thenTasks = elements.get("then")
+    	    thenTasks.each { task -> task.execute(); }
+    	}
+
+      ]]>
+    </scriptdef>
+
+  	<!-- set a property so we only compile if the srcDir exists -->
+ 
+  	<available file="${srcDir}" type="dir" property="srcDir.found"/>
+
+  	<if property="srcDir.found">
+  	  <then>
+  	  	<mkdir dir="${destDir}"/>
+        <groovyc destdir="${destDir}" srcdir="${srcDir}" listfiles="true">
+           <classpath refid="classpath"/>
+        </groovyc>
+  	  </then>
+  	</if>
   </target>
 </project>
 

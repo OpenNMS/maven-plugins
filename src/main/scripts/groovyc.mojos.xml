@@ -1,0 +1,95 @@
+<pluginMetadata>
+  <mojos>
+    <mojo>
+      <goal>compile</goal>
+        
+      <!-- this element refers to the Ant target we'll invoke -->
+      <call>groovyc</call>
+
+      <requiresProject>true</requiresProject>
+      
+      <description>
+         Compile groovyc sources
+      </description>
+      <parameters>
+        <parameter>
+          <name>destDir</name> 
+          <property>destDir</property> 
+          <required>true</required> 
+          <expression>${groovyc.destDir}</expression>
+          <defaultValue>${project.build.outputDirectory}</defaultValue>
+          <type>java.lang.String</type>
+          <description>The destination for compiled groovy files</description>
+        </parameter>
+        
+        <parameter>
+          <name>srcDir</name> 
+          <property>srcDir</property>
+          <required>true</required>
+          <expression>${groovyc.srcDir}</expression>
+          <defaultValue>${basedir}/src/main/groovy</defaultValue>
+          <type>java.lang.String</type>
+          <description>The source directory to search for groovy source files.</description>
+        </parameter>
+
+        <parameter>
+          <name>compileClasspath</name>
+          <property>groovy.compile.classpath</property>
+          <required>true</required>
+          <readonly>true</readonly>
+          <defaultValue>${project.compileClasspathElements}</defaultValue>
+          <type>java.util.List</type>
+        </parameter>
+
+      </parameters>
+
+    </mojo>
+
+    <mojo>
+      <goal>test-compile</goal>
+
+      <!-- this element refers to the Ant target we'll invoke -->
+      <call>groovyc</call>
+
+      <requiresProject>true</requiresProject>
+
+      <description>
+         Compile groovyc sources
+      </description>
+      <parameters>
+        <parameter>
+          <name>destDir</name>
+          <property>destDir</property>
+          <required>true</required>
+          <expression>${groovyc.testDestDir}</expression>
+          <defaultValue>${project.build.testOutputDirectory}</defaultValue>
+          <type>java.lang.String</type>
+          <description>The destination for compiled groovy files</description>
+        </parameter>
+
+        <parameter>
+          <name>srcDir</name>     
+          <property>srcDir</property>
+          <required>true</required>
+          <expression>${groovyc.testSrcDir}</expression>
+          <defaultValue>${basedir}/src/test/groovy</defaultValue>
+          <type>java.lang.String</type>
+          <description>The source directory to search for groovy source files.</description>
+        </parameter>
+
+        <parameter>
+          <name>compileClasspath</name>
+          <property>groovy.compile.classpath</property>
+          <required>true</required>
+          <readonly>true</readonly>
+          <defaultValue>${project.testClasspathElements}</defaultValue>
+          <type>java.util.List</type>
+        </parameter>
+
+
+      </parameters>
+
+    </mojo>
+  </mojos>
+</pluginMetadata>
+

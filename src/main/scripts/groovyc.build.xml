@@ -1,0 +1,26 @@
+<project>
+  <target name="groovyc">
+
+    <script language="groovy">
+      import org.apache.tools.ant.types.Path
+      import org.codehaus.plexus.util.StringUtils
+
+      List compilePath = project.getReference("groovy.compile.classpath")
+      
+      Path path = new Path(project)
+      path.setPath( StringUtils.join( compilePath.iterator(), File.pathSeparator ) );
+
+      project.addReference("classpath", path);
+
+    </script>
+ 
+    <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
+      <classpath refid="classpath"/>
+    </taskdef>
+    <mkdir dir="${destDir}"/>
+    <groovyc destdir="${destDir}" srcdir="${srcDir}" listfiles="true">
+      <classpath refid="classpath"/>
+    </groovyc>
+  </target>
+</project>
+

@@ -1,0 +1,26 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>gwt-client</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <phases>
+          <compile>org.codehaus.mojo:gwt-maven-plugin:compile</compile>
+        </phases>
+      </configuration>
+    </component>
+
+    <!-- Artifact Handlers -->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>plexus-service</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>gwt-client</type>
+        <extension>gwt</extension>
+        <packaging>gwt-client</packaging>
+      </configuration>
+    </component>
+  </components>
+</component-set>

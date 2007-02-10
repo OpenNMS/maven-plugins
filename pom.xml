@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+$Id: pom.xml 75 2006-12-09 14:55:54Z bob $
+Author: Bob Allison
+ -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.opennms.maven.plugins</groupId>
+    <artifactId>gwt-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Maven GWT Plugin</name>
+    <!-- Work-around for MNG-2209 -->
+    <url>${project.artifactId}/</url>
+    <scm>
+      <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</connection>
+      <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</developerConnection>
+      <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</url>
+    </scm>  
+    <distributionManagement>
+      <repository>
+        <id>opennms-repo</id>
+        <name>OpenNMS Maven Repository</name>
+        <url>scpexe://repo.opennms.org/var/www/sites/opennms.org/site/repo/maven2</url>
+      </repository>
+      <snapshotRepository>
+        <id>opennms-snapshots</id>
+        <name>OpenNMS Snapshot Maven Repository</name>
+        <url>scpexe://repo.opennms.org/var/www/sites/opennms.org/site/repo/snapshots</url>
+      </snapshotRepository>
+      <site>
+        <id>opennms-site</id>
+        <name>OpenNMS Build Website</name>
+        <url>scpexe://repo.opennms.org/var/www/sites/opennms.org/site/repo/sites</url>
+      </site>
+    </distributionManagement>
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagBase>
+              https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags
+            </tagBase>
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-project</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-booter</artifactId>
+            <version>2.0</version>
+        </dependency>
+    </dependencies>
+    <reporting> <!-- Copied from Maven plugin parent -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-checkstyle-plugin/src/main/resources/config/maven_checks.xml</configLocation>
+                    <headerLocation>http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-checkstyle-plugin/src/main/resources/config/maven-header.txt</headerLocation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+            </plugin>
+            <!--
+      <plugin>
+       org.codehaus.mojo:cobertura-maven-plugin > org.codehaus.mojo:taglist-maven-plugin > org.codehaus.mojo:cobertura-maven-plugin
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+      -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>http://java.sun.com/j2ee/1.4/docs/api</link>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                        <link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+                        <link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
+                        <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+                        <link>http://www.junit.org/junit/javadoc/</link>
+                        <link>http://logging.apache.org/log4j/docs/api/</link>
+                        <link>http://jakarta.apache.org/regexp/apidocs/</link>
+                        <link>http://jakarta.apache.org/velocity/api/</link>
+                    </links>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>

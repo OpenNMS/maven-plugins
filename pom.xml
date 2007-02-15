@@ -9,14 +9,14 @@ Author: Bob Allison
     <groupId>org.opennms.maven.plugins</groupId>
     <artifactId>gwt-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Maven GWT Plugin</name>
     <!-- Work-around for MNG-2209 -->
     <url>${project.artifactId}/</url>
     <scm>
-      <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</connection>
-      <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</developerConnection>
-      <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</url>
+      <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</connection>
+      <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</developerConnection>
+      <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</url>
     </scm>  
     <distributionManagement>
       <repository>

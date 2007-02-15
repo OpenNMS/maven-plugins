@@ -209,14 +209,54 @@ public abstract class AbstractGWTMojo
     }
     
     // // //  Methods for mojos
-    
+
     /**
      * Run the GWT tool.
      * @param classname The class to execute
      * @param target The target for GWT to operate on
      * @throws MojoExecutionException if a problem occurs running GWT
      */
-    protected void runGWT( String classname, String target )
+    protected void runGWT(String classname, String target)
+    throws MojoExecutionException
+    {
+	runGWT( classname, target, new String[0] );
+    }
+
+    /**
+     * Run the GWT tool.
+     * @param classname The class to execute
+     * @param target The target for GWT to operate on
+     * @param arg Extra arguments to pass
+     * @throws MojoExecutionException if a problem occurs running GWT
+     */
+    protected void runGWT(String classname, String target, String arg)
+    throws MojoExecutionException
+    {
+	runGWT( classname, target, new String[] { arg } );
+    }
+    
+    /**
+     * Run the GWT tool.
+     * @param classname The class to execute
+     * @param target The target for GWT to operate on
+     * @param arg1 Extra arguments to pass
+     * @param arg2 Extra arguments to pass
+     * @throws MojoExecutionException if a problem occurs running GWT
+     */
+    protected void runGWT(String classname, String target, String arg1, String arg2)
+    throws MojoExecutionException
+    {
+	runGWT( classname, target, new String[] { arg1, arg2 } );
+    }
+
+    /**
+     * Run the GWT tool.
+     * @param classname The class to execute
+     * @param target The target for GWT to operate on
+     * @param arguments Extra arguments to pass
+     * @throws MojoExecutionException if a problem occurs running GWT
+     */
+    protected void runGWT( String classname, String target, String[] arguments )
     throws MojoExecutionException
     {
         // Build the command line
@@ -237,6 +277,11 @@ public abstract class AbstractGWTMojo
             }
         }
         cl.createArgument().setValue( classname );
+
+	for( int i = 0; i < arguments.length; i++ ) {
+	    cl.createArgument().setValue( arguments[i] );
+	}
+
         cl.createArgument().setValue( "-out" );
         cl.createArgument().setValue( outputDirectory.getAbsolutePath() );
         cl.createArgument().setValue( target );

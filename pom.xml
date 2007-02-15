@@ -14,9 +14,9 @@ Author: Bob Allison
     <!-- Work-around for MNG-2209 -->
     <url>${project.artifactId}/</url>
     <scm>
-      <connection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</connection>
-      <developerConnection>scm:svn:https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</developerConnection>
-      <url>https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</url>
+      <connection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</connection>
+      <developerConnection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</developerConnection>
+      <url>https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.0</url>
     </scm>  
     <distributionManagement>
       <repository>
@@ -41,7 +41,7 @@ Author: Bob Allison
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <tagBase>
-              https://svn.sourceforge.net/svnroot/opennms/maven-plugins/tags
+              https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags
             </tagBase>
           </configuration>
         </plugin>

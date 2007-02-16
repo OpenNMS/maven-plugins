@@ -34,6 +34,9 @@ public class CompileMojo
         throws MojoExecutionException
     {
         // Run the tool
-        runGWT( "com.google.gwt.dev.GWTCompiler", getModuleName(), "-style", "PRETTY" );
+        GWTCompiler gwt = GWTCompiler.create(getModuleName());
+        configure(gwt, false);
+        gwt.run();
     }
+
 }

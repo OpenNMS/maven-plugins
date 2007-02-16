@@ -42,7 +42,11 @@ public class TestMojo
     public void execute()
         throws MojoExecutionException
     {
+        requireGWTDirectory("test");
         // Run the tool
-        runJUnit( testClass );
+        GWTCommand gwt = GWTCommand.create("junit.textui.TestRunner", testClass, null);
+        configure(gwt, true);
+        
+        gwt.getJUnit();
     }
 }

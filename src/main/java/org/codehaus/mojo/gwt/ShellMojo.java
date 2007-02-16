@@ -33,7 +33,11 @@ public class ShellMojo
     public void execute()
         throws MojoExecutionException
     {
+        String url = ( getModuleName() + "/" + getHomePage() );
         // Run the tool
-        runGWT( "com.google.gwt.dev.GWTShell", ( getModuleName() + "/" + getHomePage() ) );
+        GWTShell gwt = GWTShell.create(url);
+        configure(gwt, false);
+        
+        gwt.run();
     }
 }

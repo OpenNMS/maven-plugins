@@ -94,8 +94,7 @@ public abstract class AbstractGWTMojo
     /**
      * The GWT installation directory.
      *
-     * @parameter alias="gwtHome"
-     * @required
+     * @parameter expression="${gwt.home}" alias="gwtHome"
      */
     File gwtDirectory;
     

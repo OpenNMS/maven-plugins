@@ -322,6 +322,9 @@ public class GWTCommand {
             return;
         }
         String[] contents = m_gwtDirectory.list();
+        if (contents == null) {
+           return;
+        }
         for ( int i = 0; i < contents.length; i++ )
         {
             if ( ( contents[i].endsWith( ".jar" ) ) && ( contents[i].indexOf( "servlet" ) == -1 ) )

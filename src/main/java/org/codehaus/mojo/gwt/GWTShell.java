@@ -21,20 +21,22 @@ public class GWTShell extends GWTCommand {
 
     private void validateGWTHome() throws MojoExecutionException {
         if (getGWTDirectory() == null) {
-            throw new MojoExecutionException("You must set gwtDirectory to run the gwt:shell goal");
+            throw new MojoExecutionException("You must configure gwtHome or set gwt.home to run the gwt:shell goal");
         }
         
         File[] files = getGWTDirectory().listFiles();
-        for ( int i = 0; i < files.length; i++ )
-        {
-            File f = files[i];
-            if ( ( f.getName().endsWith( ".jar" ) ) && ( f.getName().startsWith("gwt-dev") ) )
+        if (files != null) {
+            for ( int i = 0; i < files.length; i++ )
             {
-                return;
+                File f = files[i];
+                if ( ( f.getName().endsWith( ".jar" ) ) && ( f.getName().startsWith("gwt-dev") ) )
+                {
+                    return;
+                }
             }
         }
         
-        throw new MojoExecutionException("gwtDirectory does not contain the gwt-dev-xxx.jar needed to run the GWTShell.  Make sure that you have set it correctly!");
+        throw new MojoExecutionException("gwtHome (gwt.home property) does not contain the gwt-dev-xxx.jar needed to run the GWTShell.  Make sure that you have set it correctly!");
 
     }
     

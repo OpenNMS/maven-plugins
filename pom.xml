@@ -56,11 +56,9 @@
       </dependencies>
     </profile>
     <profile>
-      <id>linux</id>
+      <id>default-for-nonmac-unix</id>
       <activation>
-        <os>
-          <name>linux</name>
-        </os>
+	<activeByDefault>true</activeByDefault>
       </activation>
       <dependencies>
         <dependency>

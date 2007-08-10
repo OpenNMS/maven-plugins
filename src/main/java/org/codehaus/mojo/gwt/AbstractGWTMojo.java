@@ -78,7 +78,7 @@ public abstract class AbstractGWTMojo
     /**
      * The name of the GWT module.
      *
-     * @parameter
+     * @parameter expression="${gwt.moduleName}"
      * @required
      */
     private String moduleName;
@@ -86,7 +86,7 @@ public abstract class AbstractGWTMojo
     /**
      * The name of the home page.
      *
-     * @parameter
+     * @parameter expression="${gwt.homePage}"
      * @required
      */
     private String homePage;

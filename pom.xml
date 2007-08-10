@@ -7,13 +7,13 @@
   </parent>
   <artifactId>gwt-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <name>Maven GWT Plugin</name>
   <url>http://code.google.com/webtoolkit/</url>
   <scm>
-    <connection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</connection>
-    <developerConnection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</developerConnection>
-    <url>https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</url>
+    <connection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.5</connection>
+    <developerConnection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.5</developerConnection>
+    <url>https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/tags/gwt-maven-plugin-1.5</url>
   </scm>
   <dependencies>
     <dependency>

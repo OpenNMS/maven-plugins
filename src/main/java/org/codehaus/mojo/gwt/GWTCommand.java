@@ -1,6 +1,8 @@
 package org.codehaus.mojo.gwt;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,6 +42,8 @@ public class GWTCommand {
     private Set m_projectDependencies;
 
     private String[] m_pathElements;
+
+    private String m_jarFile;
 
     public GWTCommand(String classname, String target, String[] arguments) {
         m_classname = classname;
@@ -173,7 +177,7 @@ public class GWTCommand {
         // Build the consumers
         StreamConsumer stdout = new StdoutConsumer( getLog() );
         StreamConsumer stderr = new StderrConsumer( getLog() );
-        
+
         // Run the tool
         try
         {
@@ -230,6 +234,38 @@ public class GWTCommand {
     void run() throws MojoExecutionException {
         // Build the command line
         Commandline cl = setupCommandLine();
+
+        // Write the classpath to a file
+        File classpathFile = null;
+        try {
+            classpathFile = new File(m_outputDirectory, "gwt-classpath");
+            FileWriter f = new FileWriter(classpathFile);
+            for(Iterator it = getClassPathEntries().iterator(); it.hasNext();) {
+                f.write((String)it.next() + "\n");
+            }
+            f.close();
+        } catch (IOException e) {
+            throw new MojoExecutionException( "Unable to create temporary claspath file", e );
+        }
+
+        StringBuffer bootstrapClasspath = new StringBuffer(m_jarFile + File.pathSeparator + "src" + File.separator + "main" + File.separator + "java");
+
+        for (Iterator it = getPluginDependencies().iterator(); it.hasNext(); ) {
+            Artifact entry = (Artifact) it.next();
+            if (bootstrapClasspath.length() != 0) {
+                bootstrapClasspath.append(File.pathSeparator);
+            }
+            bootstrapClasspath.append(entry.getFile().toString());
+        }
+
+        if (bootstrapClasspath.length() > 0) {
+            cl.createArgument().setValue("-cp");
+            cl.createArgument().setValue(bootstrapClasspath.toString());
+        }
+
+        // call our command wrapper
+        cl.createArgument().setValue( "org.codehaus.mojo.gwt.JavaCommand" );
+        cl.createArgument().setValue( classpathFile.getAbsolutePath() );
         
         cl.createArgument().setValue( getClassname() );
     
@@ -250,8 +286,7 @@ public class GWTCommand {
         if ( isMac() ) {
             cl.createArgument().setValue( "-XstartOnFirstThread" );
         }
-        cl.createArgument().setValue( "-cp" );
-        cl.createArgument().setValue( getClassPath() );
+
         if ( getSystemProperties() != null )
         {
             for ( Iterator it = getSystemProperties().keySet().iterator(); it.hasNext(); )
@@ -377,6 +412,10 @@ public class GWTCommand {
     void addGWTJarsToClasspath() {
         
         addGWTJarsFromGWTDirectory();
+    }
+
+    public void setPluginJar(String jarFile) {
+        m_jarFile = jarFile;
     }
 
 

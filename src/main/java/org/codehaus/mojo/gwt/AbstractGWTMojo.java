@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -128,7 +131,7 @@ public abstract class AbstractGWTMojo
      * 
      */
     private List pluginArtifacts;
-    
+
     /**
      * @parameter expression="${project.artifacts}"
      * @require
@@ -136,9 +139,44 @@ public abstract class AbstractGWTMojo
      */
     private Set projectDependencyArtifacts;
     
+    /**
+     * @parameter expression="${plugin.groupId}"
+     * @require
+     * @readonly
+     */
+    private String pluginGroupId;
     
+    /**
+     * @parameter expression="${plugin.artifactId}"
+     * @require
+     * @readonly
+     */
+    private String pluginArtifactId;
     
-    // // //  Getters for subclasses
+    /**
+     * @parameter expression="${plugin.version}"
+     * @require
+     * @readonly
+     */
+    private String pluginVersion;
+    
+    /**
+     * @parameter expression="${localRepository}"
+     * @require
+     * @readonly
+     */
+    private ArtifactRepository localRepository;
+    
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @require
+     * @readonly
+     */
+    private ArtifactFactory af;
+    
+
+    
+    //  Getters for subclasses
     
     
     /**
@@ -195,7 +233,9 @@ public abstract class AbstractGWTMojo
     }
     
     protected void configure(GWTCommand gwt, boolean addTest ) {
-        
+        Artifact artifact = af.createArtifact(pluginGroupId, pluginArtifactId, pluginVersion, "compile", "jar");
+
+        gwt.setPluginJar(localRepository.getBasedir() + File.separator + localRepository.pathOf(artifact));
         gwt.setPluginDependencies(pluginArtifacts);
         gwt.setProjectDependencies(projectDependencyArtifacts);
         gwt.setPathElements(pathelements);

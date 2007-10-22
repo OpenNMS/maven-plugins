@@ -3,6 +3,8 @@ package org.codehaus.mojo.gwt;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,6 +46,8 @@ public class GWTCommand {
     private String[] m_pathElements;
 
     private String m_jarFile;
+
+    private List m_wrapperClasspath = new ArrayList();
 
     public GWTCommand(String classname, String target, String[] arguments) {
         m_classname = classname;
@@ -248,8 +252,15 @@ public class GWTCommand {
             throw new MojoExecutionException( "Unable to create temporary claspath file", e );
         }
 
-        StringBuffer bootstrapClasspath = new StringBuffer(m_jarFile + File.pathSeparator + "src" + File.separator + "main" + File.separator + "java");
+        StringBuffer bootstrapClasspath = new StringBuffer();
 
+        for (Iterator it = getWrapperClasspathEntries().iterator(); it.hasNext(); ) {
+            if (bootstrapClasspath.length() != 0) {
+                bootstrapClasspath.append(File.pathSeparator);
+            }
+            bootstrapClasspath.append((String)it.next());
+        }
+        
         for (Iterator it = getPluginDependencies().iterator(); it.hasNext(); ) {
             Artifact entry = (Artifact) it.next();
             if (bootstrapClasspath.length() != 0) {
@@ -414,9 +425,12 @@ public class GWTCommand {
         addGWTJarsFromGWTDirectory();
     }
 
-    public void setPluginJar(String jarFile) {
-        m_jarFile = jarFile;
+    public List getWrapperClasspathEntries() {
+        return m_wrapperClasspath;
     }
-
-
+    
+    public void addWrapperClasspathEntry(String entry) {
+        m_wrapperClasspath.add(entry);
+    }
+    
 }

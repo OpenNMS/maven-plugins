@@ -198,7 +198,7 @@ public abstract class AbstractGWTMojo
     }
     
     
-    // // //  Consumers for tool output
+    //  Consumers for tool output
     
     private void setClassPathEntries(boolean addTest, GWTCommand gwt) {
         // Start the class path with the source directory (according to hint
@@ -235,7 +235,10 @@ public abstract class AbstractGWTMojo
     protected void configure(GWTCommand gwt, boolean addTest ) {
         Artifact artifact = af.createArtifact(pluginGroupId, pluginArtifactId, pluginVersion, "compile", "jar");
 
-        gwt.setPluginJar(localRepository.getBasedir() + File.separator + localRepository.pathOf(artifact));
+        gwt.addWrapperClasspathEntry(localRepository.getBasedir() + File.separator + localRepository.pathOf(artifact));
+        gwt.addWrapperClasspathEntry(sourceDirectory.getAbsolutePath());
+        gwt.addWrapperClasspathEntry(classDirectory.getAbsolutePath());
+        
         gwt.setPluginDependencies(pluginArtifacts);
         gwt.setProjectDependencies(projectDependencyArtifacts);
         gwt.setPathElements(pathelements);

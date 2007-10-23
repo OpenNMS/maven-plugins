@@ -15,6 +15,18 @@
     <developerConnection>scm:svn:https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</developerConnection>
     <url>https://opennms.svn.sourceforge.net/svnroot/opennms/maven-plugins/trunk/gwt-maven-plugin</url>
   </scm>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.4</source>
+          <target>1.4</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

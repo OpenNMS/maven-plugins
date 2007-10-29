@@ -3,7 +3,6 @@ package org.codehaus.mojo.gwt;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,8 +43,6 @@ public class GWTCommand {
     private Set m_projectDependencies;
 
     private String[] m_pathElements;
-
-    private String m_jarFile;
 
     private List m_wrapperClasspath = new ArrayList();
 

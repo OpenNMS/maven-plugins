@@ -15,9 +15,8 @@ import java.util.List;
 
 public class JavaCommand {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, SecurityException, NoSuchMethodException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SecurityException, NoSuchMethodException, InterruptedException {
         final String classToExecMethod = "main";
-        final String[] classToExecArgs = args;
 
         List list = new ArrayList(Arrays.asList(args));
 
@@ -38,7 +37,11 @@ public class JavaCommand {
         } else {
             cl = loadClassesFromFile(file);
         }
-        
+
+        final String[] classToExecArgs = (String[]) list.toArray(new String[0]);
+
+        System.out.println("GWT: executing " + className + ".main("+ list + ")");
+
         final Class[] classes = new Class[] { classToExecArgs.getClass() };
         final Object[] methodArgs = new Object[] { classToExecArgs };
         Class c = cl.loadClass(className);
@@ -64,7 +67,7 @@ public class JavaCommand {
         Thread bootstrapper = new Thread(execer, "Main");
         bootstrapper.setContextClassLoader(cl);
         bootstrapper.start();
-        // System.exit(0);
+        bootstrapper.join();
     }
 
     /**

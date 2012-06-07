@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="bundles-with-startlevels">
+    <feature version="1.0" name="bundles-with-startlevels">
+      <bundle start-level="20">mvn:org.opennms.core/org.opennms.core.xml/1.11.1-SNAPSHOT</bundle>
+    </feature>
+</features>

@@ -9,7 +9,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.maven.plugins.features.integration-tests</groupId>
-  <artifactId>bundles</artifactId>
+  <artifactId>bundles-with-startlevels</artifactId>
 
   <packaging>pom</packaging>
 
@@ -27,19 +27,10 @@
         </executions>
         <configuration>
           <bundles>
-            <bundle>mvn:org.opennms.core/org.opennms.core.xml/1.11.1-SNAPSHOT</bundle>
+            <bundle>mvn:org.opennms.core/org.opennms.core.xml/1.11.1-SNAPSHOT@20</bundle>
           </bundles>
         </configuration>
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.opennms.maven.plugin.features.integration-tests</groupId>
-      <artifactId>validation</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 </project>

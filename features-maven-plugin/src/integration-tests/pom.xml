@@ -10,7 +10,11 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>bundles</module>
+    <module>01features</module>
+    <module>02features-with-versions</module>
+    <module>03bundles</module>
+    <module>04bundles-with-startlevels</module>
+    <module>05dependencies</module>
   </modules>
 
   <build>

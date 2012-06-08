@@ -35,40 +35,35 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.jar.JarFile;
-import java.util.zip.ZipException;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.karaf.features.internal.model.Feature;
 import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
-import org.apache.karaf.tooling.features.DependencyHelper;
 import org.apache.karaf.tooling.features.ManifestUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
 
 /**
  * Goal which generates a karaf features.xml from maven
  * 
  * @goal generate-features-xml
  * @phase process-resources
+ * @requiresDependencyResolution
  */
 @SuppressWarnings("restriction")
 public class GenerateFeaturesXmlMojo extends AbstractMojo {
-    private static final List<String> DEFAULT_IGNORED_SCOPES = Collections.unmodifiableList(Arrays.asList(new String[] {"test", "provided"}));
 
 	/**
      * (wrapper) The maven project.
@@ -115,6 +110,15 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
     RepositorySystem repoSystem;
 
     /**
+     * The maven project's helper.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    protected MavenProjectHelper projectHelper;
+
+    /**
      * Location of the file.
      * @parameter expression="${project.build.directory}/features/features.xml"
      */
@@ -139,18 +143,28 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 	private List<String> ignoredScopes;
 
 	public void execute() throws MojoExecutionException {
-    	final FeaturesBuilder builder = new FeaturesBuilder(project.getArtifactId());
-    	final FeatureBuilder fb = builder.createFeature(project.getArtifactId(), project.getVersion());
-    	
-    	addFeaturesFromConfiguration(fb);
-    	addBundlesFromConfiguration(fb);
-    	addDependenciesFromMaven(fb);
+    	final FeaturesBuilder featuresBuilder = new FeaturesBuilder(project.getArtifactId());
+    	final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(project.getArtifactId(), project.getVersion());
+    	if (project.getName() != project.getArtifactId()) {
+    		projectFeatureBuilder.setDescription(project.getName());
+    	}
+    	projectFeatureBuilder.setDetails(project.getDescription());
+
+    	addFeaturesFromConfiguration(projectFeatureBuilder);
+    	addBundlesFromConfiguration(projectFeatureBuilder);
+    	addDependenciesFromMaven(featuresBuilder, projectFeatureBuilder);
+
+    	final Features features = featuresBuilder.getFeatures();
+
+    	if (projectFeatureBuilder.isEmpty()) {
+    		features.getFeature().remove(projectFeatureBuilder.getFeature());
+    	}
 
     	FileWriter writer = null;
 		try {
 			outputFile.getParentFile().mkdirs();
 			writer = new FileWriter(outputFile);
-			JaxbUtil.marshal(builder.getFeatures(), writer);
+			JaxbUtil.marshal(features, writer);
 		} catch (final IOException e) {
 			throw new MojoExecutionException("Unable to open outputFile (" + outputFile + ") for writing.", e);
 		} catch (final JAXBException e) {
@@ -158,6 +172,8 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 		} finally {
 			IOUtil.close(writer);
 		}
+		
+		projectHelper.attachArtifact(project, "xml", "features", outputFile);
     }
 
 	void addFeaturesFromConfiguration(final FeatureBuilder featureBuilder) {
@@ -180,36 +196,74 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
     	}
 	}
 
-	void addDependenciesFromMaven(final FeatureBuilder fb) throws MojoExecutionException {
-		if (pluginRepos == null)  { getLog().warn("plugin repository is missing, skipping dependency-walking");  return; }
-		if (projectRepos == null) { getLog().warn("project repository is missing, skipping dependency-walking"); return; }
-		if (repoSession == null)  { getLog().warn("repository session is missing, skipping dependency-walking"); return; }
-		if (repoSystem == null)   { getLog().warn("repository system is missing, skipping dependency-walking");  return; }
+	void addDependenciesFromMaven(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder) throws MojoExecutionException {
+		getLog().debug("project = " + project);
 
-		final DependencyHelper dependencyHelper = new DependencyHelper(pluginRepos, projectRepos, repoSession, repoSystem);
-        dependencyHelper.getDependencies(project, true);
-        
-        getLog().debug("dependencyHelper found: " + dependencyHelper.getTreeListing());
-
-        final Map<Artifact, String> localDependencies = dependencyHelper.getLocalDependencies();
-		addLocalDependencies(fb, localDependencies);
+		addLocalDependencies(featuresBuilder, projectFeatureBuilder, project);
 	}
 
-	void addLocalDependencies(final FeatureBuilder fb, final Map<Artifact, String> localDependencies) throws MojoExecutionException {
-		for (final Map.Entry<Artifact,String> entry : localDependencies.entrySet()) {
-        	final Artifact artifact = entry.getKey();
-        	final String scope = entry.getValue();
+	void addLocalDependencies(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder, final MavenProject project) throws MojoExecutionException {
+        
+		for (final Dependency dependency : project.getDependencies()) {
+			getLog().debug("getting artifact for dependency " + dependency);
 
-        	if (getIgnoredScopes().contains(scope)) {
-        		getLog().debug("Artifact " + artifact + " is in scope: " + scope + ", ignoring.");
-        	} else {
-	        	try {
-					addArtifact(fb, artifact);
+			if (getIgnoredScopes().contains(dependency.getScope())) {
+        		getLog().debug("Dependency " + dependency + " is in scope: " + dependency.getScope() + ", ignoring.");
+        		continue;
+			}
+
+			org.apache.maven.artifact.Artifact matched = null;
+			for (final org.apache.maven.artifact.Artifact art : project.getArtifacts()) {
+				if (!dependency.getGroupId().equals(art.getGroupId())) { continue; }
+				if (!dependency.getArtifactId().equals(art.getArtifactId())) { continue; }
+				if (!dependency.getVersion().equals(art.getVersion())) { continue; }
+				if (!dependency.getType().equals(art.getType())) { continue; }
+				if (dependency.getClassifier() == null && art.getClassifier() != null) { continue; }
+				if (dependency.getClassifier() != null && !dependency.getClassifier().equals(art.getClassifier())) { continue; }
+
+				matched = art;
+				break;
+			}
+			
+			if (matched == null) {
+				throw new MojoExecutionException("Unable to match artifact for dependency: " + dependency);
+			} else {
+				getLog().debug("Found match for dependency: " + dependency);
+				try {
+					addBundleArtifact(featuresBuilder, projectFeatureBuilder, matched);
 				} catch (final Exception e) {
-					throw new MojoExecutionException("Unable to add artifact: " + artifact, e);
+					throw new MojoExecutionException("An error occurred while adding artifact " + matched + " to the features file.", e);
 				}
-        	}
-        }
+			}
+			/*
+			final org.apache.maven.artifact.Artifact art = artifactFactory.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getType(), dependency.getClassifier());
+			try {
+				resolver.resolve(art, remoteRepositories, localRepository);
+			} catch (Exception e) {
+				throw new MojoExecutionException("failed to resolve dependency: " + dependency, e);
+			}*/
+
+			// getLog().debug("found artifact result: " + art + " (" + art.getFile() + ")");
+			// addBundleArtifact(fb, art);
+			/*
+			final org.sonatype.aether.graph.Dependency dep = RepositoryUtils.toDependency(dependency, repoSession.getArtifactTypeRegistry());
+			final DependencyRequest request = new DependencyRequest();
+			final DependencyNode root = new DefaultDependencyNode(dep);
+			request.setRoot(root);
+			final DependencyResult result;
+			try {
+				result = repoSystem.resolveDependencies(repoSession, request);
+			} catch (final DependencyResolutionException e) {
+				throw new MojoExecutionException("failed to resolve dependency: " + dependency, e);
+			}
+			
+			for (final ArtifactResult artifactResult : result.getArtifactResults()) {
+				getLog().debug("found artifact result: " + artifactResult);
+				// addBundleArtifact(fb, artifact);
+			}
+			*/
+		}
+		
 	}
 
 	void addFeature(final FeatureBuilder featureBuilder, final String feature) {
@@ -245,57 +299,61 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 				featureBuilder.addBundle(bundleInfo[0], startLevel);
 			}
 		} else {
+			
 			// no startLevel specified
 			featureBuilder.addBundle(bundle);
 		}
 	}
 
-	void addArtifact(final FeatureBuilder fb, Artifact artifact) throws IOException, JAXBException {
-		getLog().debug("addArtifact: " + artifact);
+	void addBundleArtifact(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder, final Artifact artifact) throws IOException, JAXBException, MojoExecutionException {
+		getLog().debug("addBundleArtifact: " + artifact);
 
-		final File file;
-		if (artifact.getFile() == null) {
-			file = resolve(artifact);
-		} else {
-			file = artifact.getFile();
-		}
-
+		final File file = artifact.getFile();
 		JarFile jf = null;
 		try {
 			jf = new JarFile(file);
-		} catch (final ZipException e) {
+		} catch (final Exception e) {
 			// we just want to see if it's something with a manifest, ignore zip failures
 		}
 
 		if (isFeature(artifact)) {
-			fb.addFeature(artifact.getArtifactId(), artifact.getVersion());
-		} else if ("pom".equals(artifact.getExtension())) {
+			getLog().debug("artifact is a feature");
+			final Features features = readFeaturesFile(file);
+			for (final Feature feature : features.getFeature()) {
+				if (projectFeatureBuilder.getFeature().getName().equals(feature.getName())) {
+					getLog().warn("Found feature named '" + feature.getName() + "' in artifact '" + artifact + "', but we already have a feature with that name.  Skipping.");
+				} else {
+					getLog().info("Including feature '" + feature.getName() + "' from " + artifact);
+					featuresBuilder.addFeature(feature);
+				}
+			}
+		} else if ("pom".equals(artifact.getType())) {
+			getLog().debug("artifact is a POM, skipping");
 			// skip POM dependencies that aren't features
 			return;
 		} else if (jf != null && jf.getManifest() != null && ManifestUtils.isBundle(jf.getManifest())) {
+			getLog().debug("artifact is a bundle");
 			final String bundleName = MavenUtil.artifactToMvn(artifact);
-			fb.addBundle(bundleName);
+			projectFeatureBuilder.addBundle(bundleName);
 		} else {
-			final String bundleName = MavenUtil.artifactToMvn(artifact);
-			fb.addBundle("wrap:" + bundleName);
+			throw new MojoExecutionException("artifact " + artifact + " is not a bundle!");
 		}
 	}
 
 	List<String> getIgnoredScopes() {
 		if (ignoredScopes == null) {
-			return DEFAULT_IGNORED_SCOPES;
+			return DependencyHelper.DEFAULT_IGNORED_SCOPES;
 		}
 		return ignoredScopes;
 	}
 
 	private boolean isFeature(final Artifact artifact) {
-		if ("kar".equals(artifact.getExtension()) || FEATURE_CLASSIFIER.equals(artifact.getClassifier())) {
+		if ("kar".equals(artifact.getType()) || FEATURE_CLASSIFIER.equals(artifact.getClassifier())) {
 			return true;
 		}
 		return false;
 	}
 
-    @SuppressWarnings("unused")
 	private Features readFeaturesFile(final File featuresFile) throws JAXBException, IOException {
         Features features = null;
         InputStream in = null;
@@ -308,25 +366,6 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
         return features;
     }
 
-    private File resolve(final Artifact artifact) {
-    	final ArtifactRequest request = new ArtifactRequest();
-        request.setArtifact(artifact);
-        request.setRepositories(projectRepos);
-
-        getLog().debug("Resolving artifact " + artifact + " from " + projectRepos);
-
-        ArtifactResult result;
-        try {
-            result = repoSystem.resolveArtifact(repoSession, request);
-        } catch (final ArtifactResolutionException e) {
-            getLog().warn("could not resolve " + artifact, e);
-            return null;
-        }
-
-        getLog().debug("Resolved artifact " + artifact + " to " + result.getArtifact().getFile() + " from " + result.getRepository());
-        return result.getArtifact().getFile();
-    }
-    
     void setIgnoredScopes(final List<String> scopes) {
     	ignoredScopes = scopes;
     }

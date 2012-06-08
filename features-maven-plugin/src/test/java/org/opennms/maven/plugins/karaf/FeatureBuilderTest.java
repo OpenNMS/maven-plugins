@@ -25,7 +25,7 @@ public class FeatureBuilderTest {
 	@Test
 	public void testCreateFeature() {
 		FeaturesBuilder builder = new FeaturesBuilder("foo");
-		FeatureBuilder featureBuilder = builder.createFeature("blah");
+		FeatureBuilder featureBuilder = builder.createFeature("blah").addBundle("foo");
 		assertNotNull(featureBuilder);
 		assertNotNull(featureBuilder.getFeature());
 		assertEquals("blah", featureBuilder.getFeature().getName());
@@ -36,7 +36,7 @@ public class FeatureBuilderTest {
 	@Test
 	public void testCreateVersionedFeature() {
 		FeaturesBuilder builder = new FeaturesBuilder("foo");
-		FeatureBuilder featureBuilder = builder.createFeature("blah", "1.0-SNAPSHOT");
+		FeatureBuilder featureBuilder = builder.createFeature("blah", "1.0-SNAPSHOT").addBundle("foo");
 		assertNotNull(featureBuilder);
 		assertNotNull(featureBuilder.getFeature());
 		assertTrue(builder.getFeatures().getFeature().size() > 0);

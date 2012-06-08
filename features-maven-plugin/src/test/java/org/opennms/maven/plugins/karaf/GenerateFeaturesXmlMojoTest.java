@@ -5,22 +5,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.karaf.features.BundleInfo;
+import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.internal.model.Dependency;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.monitor.logging.DefaultLog;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.util.artifact.DefaultArtifactType;
 
 public class GenerateFeaturesXmlMojoTest {
 	GenerateFeaturesXmlMojo m_mojo;
@@ -73,38 +73,36 @@ public class GenerateFeaturesXmlMojoTest {
 	
 	@Test
 	public void testBundleDependency() throws Exception {
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
+		final FeaturesBuilder featuresBuilder = new FeaturesBuilder("myFeature");
+		final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature("myFeature");
 
-		final org.sonatype.aether.artifact.Artifact artifact = getBundleArtifact();
-		m_mojo.addArtifact(fb, artifact);
+		final Artifact artifact = getBundleArtifact();
+		m_mojo.addBundleArtifact(featuresBuilder, projectFeatureBuilder, artifact);
 		
-		final List<BundleInfo> bundles = fb.getFeature().getBundles();
+		final List<BundleInfo> bundles = projectFeatureBuilder.getFeature().getBundles();
 		assertNotNull(bundles);
 		assertEquals(1, bundles.size());
 		assertEquals("mvn:org.opennms.core/org.opennms.core.api/1.11.1-SNAPSHOT", bundles.get(0).getLocation());
 	}
 
-	@Test
+	@Test(expected=MojoExecutionException.class)
 	public void testJarDependency() throws Exception {
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
+		final FeaturesBuilder featuresBuilder = new FeaturesBuilder("myFeature");
+		final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature("myFeature");
 
-		final org.sonatype.aether.artifact.Artifact artifact = getJarArtifact();
-		m_mojo.addArtifact(fb, artifact);
-		
-		final List<BundleInfo> bundles = fb.getFeature().getBundles();
-		assertNotNull(bundles);
-		assertEquals(1, bundles.size());
-		assertEquals("wrap:mvn:org.opennms.core.test-api/org.opennms.core.test-api.lib/1.10.4-SNAPSHOT", bundles.get(0).getLocation());
+		final Artifact artifact = getJarArtifact();
+		m_mojo.addBundleArtifact(featuresBuilder, projectFeatureBuilder, artifact);
 	}
 
 	@Test
 	public void testFeatureDependency() throws Exception {
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
+		final FeaturesBuilder featuresBuilder = new FeaturesBuilder("myFeature");
+		final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature("myFeature");
 
-		final org.sonatype.aether.artifact.Artifact artifact = getFeatureArtifact();
-		m_mojo.addArtifact(fb, artifact);
+		final Artifact artifact = getFeatureArtifact();
+		m_mojo.addBundleArtifact(featuresBuilder, projectFeatureBuilder, artifact);
 
-		final List<Dependency> features = fb.getFeature().getFeature();
+		final List<? extends Feature> features = featuresBuilder.getFeatures().getFeature();
 		assertNotNull(features);
 		assertEquals(1, features.size());
 		assertEquals("vaadin", features.get(0).getName());
@@ -113,100 +111,69 @@ public class GenerateFeaturesXmlMojoTest {
 
 	@Test
 	public void testPomDependency() throws Exception {
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
-		final org.sonatype.aether.artifact.Artifact artifact = getPomArtifact();
-		m_mojo.addArtifact(fb, artifact);
+		final FeaturesBuilder featuresBuilder = new FeaturesBuilder("myFeature");
+		final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature("myFeature");
 
-		final List<Dependency> features = fb.getFeature().getFeature();
+		final Artifact artifact = getPomArtifact();
+		m_mojo.addBundleArtifact(featuresBuilder, projectFeatureBuilder, artifact);
+
+		final List<Dependency> features = projectFeatureBuilder.getFeature().getFeature();
 		assertNotNull(features);
 		assertEquals(0, features.size());
 	}
 
-	@Test
-	public void testAddLocalDependencies() throws Exception {
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
-
-		final Map<Artifact,String> localDependencies = new HashMap<Artifact,String>();
-		localDependencies.put(getBundleArtifact(), "compile");
-		localDependencies.put(getJarArtifact(), "compile");
-		localDependencies.put(getFeatureArtifact(), "compile");
-
-		m_mojo.addLocalDependencies(fb, localDependencies);
-
-		final List<Dependency> features = fb.getFeature().getFeature();
-		assertNotNull(features);
-		assertEquals(1, features.size());
-		
-		final List<BundleInfo> bundles = fb.getFeature().getBundles();
-		assertNotNull(bundles);
-		assertEquals(2, bundles.size());
-	}
-
-	@Test
-	public void testAddLocalDependenciesWithIgnoredScopes() throws Exception {
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
-		
-		final Map<Artifact,String> localDependencies = new LinkedHashMap<Artifact,String>();
-		localDependencies.put(getBundleArtifact(), "test");      // skipped
-		localDependencies.put(getFeatureArtifact(), "provided"); // skipped
-		localDependencies.put(getJarArtifact(), "runtime");      // added
-
-		m_mojo.addLocalDependencies(fb, localDependencies);
-		
-		final List<BundleInfo> bundles = fb.getFeature().getBundles();
-		final List<Dependency> features = fb.getFeature().getFeature();
-		assertNotNull(bundles);
-		assertNotNull(features);
-		assertEquals(1, bundles.size());
-		assertEquals(0, features.size());
-		assertEquals("wrap:mvn:org.opennms.core.test-api/org.opennms.core.test-api.lib/1.10.4-SNAPSHOT", bundles.get(0).getLocation());
-	}
-
-	@Test
-	public void testAddLocalDependenciesWithNonStandardIgnoredScopes() throws Exception {
-		final ArrayList<String> ignored = new ArrayList<String>();
-		ignored.add("compile");
-		m_mojo.setIgnoredScopes(ignored);
-
-		final FeatureBuilder fb = new FeatureBuilder("myFeature");
-		
-		final Map<Artifact,String> localDependencies = new LinkedHashMap<Artifact,String>();
-		localDependencies.put(getBundleArtifact(), "test");      // added
-		localDependencies.put(getFeatureArtifact(), "provided"); // added
-		localDependencies.put(getJarArtifact(), "runtime");      // added
-
-		m_mojo.addLocalDependencies(fb, localDependencies);
-		
-		final List<BundleInfo> bundles = fb.getFeature().getBundles();
-		final List<Dependency> features = fb.getFeature().getFeature();
-		assertNotNull(bundles);
-		assertNotNull(features);
-		assertEquals(2, bundles.size());
-		assertEquals(1, features.size());
-		assertEquals("mvn:org.opennms.core/org.opennms.core.api/1.11.1-SNAPSHOT", bundles.get(0).getLocation());
-		assertEquals("wrap:mvn:org.opennms.core.test-api/org.opennms.core.test-api.lib/1.10.4-SNAPSHOT", bundles.get(1).getLocation());
-	}
-
-	private org.sonatype.aether.artifact.Artifact getBundleArtifact() {
+	private Artifact getBundleArtifact() {
 		final File file = new File("src/test/resources/bundle.jar");
-		final org.sonatype.aether.artifact.Artifact artifact = new org.sonatype.aether.util.artifact.DefaultArtifact("org.opennms.core", "org.opennms.core.api", null, "jar", "1.11.1-SNAPSHOT", new DefaultArtifactType("jar", "jar", "", "")).setFile(file);
+		final String groupId = "org.opennms.core";
+		final String artifactId = "org.opennms.core.api";
+		final String classifier = "";
+		final String type = "jar";
+		final String version = "1.11.1-SNAPSHOT";
+		final String scope = "compile";
+		final Artifact artifact = createArtifact(file, groupId, artifactId, version, type, classifier, scope);
 		return artifact;
 	}
 
-	private org.sonatype.aether.artifact.Artifact getJarArtifact() {
+	private Artifact getJarArtifact() {
 		final File file = new File("src/test/resources/jar.jar");
-		final org.sonatype.aether.artifact.Artifact artifact = new org.sonatype.aether.util.artifact.DefaultArtifact("org.opennms.core.test-api", "org.opennms.core.test-api.lib", "", "jar", "1.10.4-SNAPSHOT", new DefaultArtifactType("jar", "jar", "", "")).setFile(file);
+		final String groupId = "org.opennms.core.test-api";
+		final String artifactId = "org.opennms.core.test-api.lib";
+		final String classifier = "";
+		final String type = "jar";
+		final String version = "1.10.4-SNAPSHOT";
+		final String scope = "compile";
+		final Artifact artifact = createArtifact(file, groupId, artifactId, version, type, classifier, scope);
 		return artifact;
 	}
 
-	private org.sonatype.aether.artifact.Artifact getFeatureArtifact() {
+	private Artifact getFeatureArtifact() {
 		final File file = new File("src/test/resources/vaadin.xml");
-		final org.sonatype.aether.artifact.Artifact artifact = new org.sonatype.aether.util.artifact.DefaultArtifact("com.example.features", "vaadin", "features", "xml", "6.7.3", new DefaultArtifactType("xml", "xml", "features", "")).setFile(file);
+		final String groupId = "com.example.features";
+		final String artifactId = "vaadin";
+		final String classifier = "features";
+		final String type = "xml";
+		final String version = "6.7.3";
+		final String scope = "compile";
+		final Artifact artifact = createArtifact(file, groupId, artifactId, version, type, classifier, scope);
 		return artifact;
 	}
 
-	private org.sonatype.aether.artifact.Artifact getPomArtifact() {
-		final org.sonatype.aether.artifact.Artifact artifact = new org.sonatype.aether.util.artifact.DefaultArtifact("com.example.features", "pomOnly", "", "pom", "1.0", new DefaultArtifactType("pom", "pom", "", "")).setFile(new File("pom.xml"));
+	private Artifact getPomArtifact() {
+		final File file = new File("pom.xml");
+		final String groupId = "com.example.features";
+		final String artifactId = "pomOnly";
+		final String classifier = "";
+		final String type = "pom";
+		final String version = "1.0";
+		final String scope = "compile";
+		final Artifact artifact = createArtifact(file, groupId, artifactId, version, type, classifier, scope);
+		return artifact;
+	}
+
+	private Artifact createArtifact(final File file, final String groupId, final String artifactId, final String version, final String type, final String classifier, final String scope) {
+		final ArtifactHandler handler = new DefaultArtifactHandler(type);
+		final DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, classifier, handler);
+		artifact.setFile(file);
 		return artifact;
 	}
 

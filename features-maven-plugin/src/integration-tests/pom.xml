@@ -12,9 +12,11 @@
   <modules>
     <module>01features</module>
     <module>02features-with-versions</module>
-    <module>03bundles</module>
-    <module>04bundles-with-startlevels</module>
-    <module>05dependencies</module>
+    <module>10bundles</module>
+    <module>11bundles-with-startlevels</module>
+    <module>20dependencies</module>
+    <module>21feature-dependencies</module>
+    <module>22invalid-dependencies</module>
   </modules>
 
   <build>

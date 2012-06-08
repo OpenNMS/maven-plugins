@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 public class Validator {
 	static {
+        XMLUnit.setIgnoreComments(true);
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
         XMLUnit.setNormalize(true);

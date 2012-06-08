@@ -45,6 +45,7 @@
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.6</version>
         <configuration>
+          <debug>true</debug>
           <streamLogs>true</streamLogs>
           <addTestClassPath>true</addTestClassPath>
           <projectsDirectory>target/classes/integration-tests</projectsDirectory>
@@ -55,8 +56,7 @@
             <id>integration-test</id>
             <goals>
               <goal>install</goal>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
+              <goal>run</goal>
             </goals>
           </execution>
         </executions>

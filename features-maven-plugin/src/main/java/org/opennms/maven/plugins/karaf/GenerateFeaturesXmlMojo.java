@@ -40,6 +40,7 @@ import java.util.jar.JarFile;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.karaf.features.BundleInfo;
 import org.apache.karaf.features.internal.model.Feature;
 import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
@@ -317,26 +318,38 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 		}
 
 		if (isFeature(artifact)) {
-			getLog().debug("artifact is a feature");
 			final Features features = readFeaturesFile(file);
 			for (final Feature feature : features.getFeature()) {
 				if (projectFeatureBuilder.getFeature().getName().equals(feature.getName())) {
-					getLog().warn("Found feature named '" + feature.getName() + "' in artifact '" + artifact + "', but we already have a feature with that name.  Skipping.");
+					getLog().warn("addBundleArtifact: Found feature named '" + feature.getName() + "' in artifact '" + artifact + "', but we already have a feature with that name.  Skipping.");
 				} else {
-					getLog().info("Including feature '" + feature.getName() + "' from " + artifact);
+					getLog().info("addBundleArtifact: Including feature '" + feature.getName() + "' from " + artifact);
 					featuresBuilder.addFeature(feature);
 				}
 			}
 		} else if ("pom".equals(artifact.getType())) {
-			getLog().debug("artifact is a POM, skipping");
+			getLog().debug("addBundleArtifact: " + artifact + " is a POM.  Skipping.");
 			// skip POM dependencies that aren't features
 			return;
 		} else if (jf != null && jf.getManifest() != null && ManifestUtils.isBundle(jf.getManifest())) {
-			getLog().debug("artifact is a bundle");
 			final String bundleName = MavenUtil.artifactToMvn(artifact);
 			projectFeatureBuilder.addBundle(bundleName);
 		} else {
-			throw new MojoExecutionException("artifact " + artifact + " is not a bundle!");
+			boolean found = false;
+
+			for (final BundleInfo bundle : projectFeatureBuilder.getFeature().getBundles()) {
+				final Artifact bundleArtifact = MavenUtil.mvnToArtifact(bundle.getLocation().replace("wrap:", ""));
+				if (bundleArtifact != null && bundleArtifact.toString().equals(artifact.toString())) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				throw new MojoExecutionException("artifact " + artifact + " is not a bundle!");
+			} else {
+				getLog().debug("Added a non-bundle artifact, but it's already defined in the <bundles> configuration.  Skipping.");
+			}
 		}
 	}
 

@@ -122,6 +122,20 @@ public class GenerateFeaturesXmlMojoTest {
 		assertEquals(0, features.size());
 	}
 
+	@Test
+	public void testAlreadyWrapped() throws Exception {
+		final FeaturesBuilder featuresBuilder = new FeaturesBuilder("myFeature");
+		final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature("myFeature");
+		
+		final Artifact artifact = getJarArtifact();
+		m_mojo.addBundle(projectFeatureBuilder, "wrap:mvn:org.opennms.core.test-api/org.opennms.core.test-api.lib/1.10.4-SNAPSHOT");
+		m_mojo.addBundleArtifact(featuresBuilder, projectFeatureBuilder, artifact);
+		
+		final List<BundleInfo> bundles = projectFeatureBuilder.getFeature().getBundles();
+		assertNotNull(bundles);
+		assertEquals(1, bundles.size());
+	}
+
 	private Artifact getBundleArtifact() {
 		final File file = new File("src/test/resources/bundle.jar");
 		final String groupId = "org.opennms.core";

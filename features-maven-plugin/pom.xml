@@ -14,13 +14,22 @@
   </properties>  
   
   <build>
- 	<resources>
- 	  <resource>
- 	    <directory>src/integration-tests</directory>
- 	    <targetPath>integration-tests</targetPath>
- 	    <filtering>true</filtering>
- 	  </resource>
- 	</resources>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>2.2</version>
+      </extension>
+    </extensions>
+
+    <resources>
+      <resource>
+        <directory>src/integration-tests</directory>
+        <targetPath>integration-tests</targetPath>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -45,7 +54,7 @@
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.6</version>
         <configuration>
-          <debug>true</debug>
+          <!-- <debug>true</debug> -->
           <streamLogs>true</streamLogs>
           <addTestClassPath>true</addTestClassPath>
           <projectsDirectory>target/classes/integration-tests</projectsDirectory>

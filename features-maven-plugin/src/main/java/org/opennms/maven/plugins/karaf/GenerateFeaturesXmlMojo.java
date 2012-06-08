@@ -35,6 +35,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -52,9 +54,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Goal which generates a karaf features.xml from maven
@@ -65,6 +64,7 @@ import org.sonatype.aether.repository.RemoteRepository;
  */
 @SuppressWarnings("restriction")
 public class GenerateFeaturesXmlMojo extends AbstractMojo {
+    static final List<String> DEFAULT_IGNORED_SCOPES = Collections.unmodifiableList(Arrays.asList(new String[] {"test", "provided"}));
 
 	/**
      * (wrapper) The maven project.
@@ -74,41 +74,6 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
      * @readonly
      */
     MavenProject project;
-
-    /**
-     * The project's remote repositories to use for the resolution of plugins and their dependencies.
-     *
-     * @parameter default-value="${project.remotePluginRepositories}"
-     * @required
-     * @readonly
-     */
-    List<RemoteRepository> pluginRepos;
-
-    /**
-     * The project's remote repositories to use for the resolution of project dependencies.
-     *
-     * @parameter default-value="${project.remoteProjectRepositories}"
-     * @readonly
-     */
-    List<RemoteRepository> projectRepos;
-
-    /**
-     * The current repository/network configuration of Maven.
-     *
-     * @parameter default-value="${repositorySystemSession}"
-     * @required
-     * @readonly
-     */
-    RepositorySystemSession repoSession;
-
-    /**
-     * The entry point to Aether, i.e. the component doing all the work.
-     *
-     * @component
-     * @required
-     * @readonly
-     */
-    RepositorySystem repoSystem;
 
     /**
      * The maven project's helper.
@@ -236,33 +201,6 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 					throw new MojoExecutionException("An error occurred while adding artifact " + matched + " to the features file.", e);
 				}
 			}
-			/*
-			final org.apache.maven.artifact.Artifact art = artifactFactory.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getType(), dependency.getClassifier());
-			try {
-				resolver.resolve(art, remoteRepositories, localRepository);
-			} catch (Exception e) {
-				throw new MojoExecutionException("failed to resolve dependency: " + dependency, e);
-			}*/
-
-			// getLog().debug("found artifact result: " + art + " (" + art.getFile() + ")");
-			// addBundleArtifact(fb, art);
-			/*
-			final org.sonatype.aether.graph.Dependency dep = RepositoryUtils.toDependency(dependency, repoSession.getArtifactTypeRegistry());
-			final DependencyRequest request = new DependencyRequest();
-			final DependencyNode root = new DefaultDependencyNode(dep);
-			request.setRoot(root);
-			final DependencyResult result;
-			try {
-				result = repoSystem.resolveDependencies(repoSession, request);
-			} catch (final DependencyResolutionException e) {
-				throw new MojoExecutionException("failed to resolve dependency: " + dependency, e);
-			}
-			
-			for (final ArtifactResult artifactResult : result.getArtifactResults()) {
-				getLog().debug("found artifact result: " + artifactResult);
-				// addBundleArtifact(fb, artifact);
-			}
-			*/
 		}
 		
 	}
@@ -355,7 +293,7 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 
 	List<String> getIgnoredScopes() {
 		if (ignoredScopes == null) {
-			return DependencyHelper.DEFAULT_IGNORED_SCOPES;
+			return DEFAULT_IGNORED_SCOPES;
 		}
 		return ignoredScopes;
 	}

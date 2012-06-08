@@ -3,7 +3,6 @@ package org.opennms.maven.plugins.karaf;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -13,30 +12,20 @@ public class MavenUtil {
     private static final Pattern mvnPattern = Pattern.compile("(?:wrap\\:)?mvn:([^/ ]+)/([^/ ]+)/([^/ ]*)(/([^/ ]+)(/([^/ ]+))?)?");
 
     /**
-     * Convert a Maven <code>Artifact</code> into a PAX URL mvn format.
+     * Convert an Artifact into a PAX URL mvn format.
      *
-     * @param artifact the Maven <code>Artifact</code>.
+     * @param artifact the Artifact.
      * @return the corresponding PAX URL mvn format (mvn:<groupId>/<artifactId>/<version>/<type>/<classifier>)
      */
 	public static String artifactToMvn(Artifact artifact) {
-        return artifactToMvn(RepositoryUtils.toArtifact(artifact));
-    }
-
-    /**
-     * Convert an Aether <code>org.sonatype.aether.artifact.Artifact</code> into a PAX URL mvn format.
-     *
-     * @param artifact the Aether <code>org.sonatype.aether.artifact.Artifact</code>.
-     * @return the corresponding PAX URL mvn format (mvn:<groupId>/<artifactId>/<version>/<type>/<classifier>)
-     */
-	public static String artifactToMvn(org.sonatype.aether.artifact.Artifact artifact) {
         String bundleName;
-        if (artifact.getExtension().equals("jar") && isEmpty(artifact.getClassifier())) {
+        if (artifact.getType().equals("jar") && isEmpty(artifact.getClassifier())) {
             bundleName = String.format("mvn:%s/%s/%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion());
         } else {
             if (isEmpty(artifact.getClassifier())) {
-                bundleName = String.format("mvn:%s/%s/%s/%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension());
+                bundleName = String.format("mvn:%s/%s/%s/%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getType());
             } else {
-                bundleName = String.format("mvn:%s/%s/%s/%s/%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), artifact.getClassifier());
+                bundleName = String.format("mvn:%s/%s/%s/%s/%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getType(), artifact.getClassifier());
             }
         }
         return bundleName;

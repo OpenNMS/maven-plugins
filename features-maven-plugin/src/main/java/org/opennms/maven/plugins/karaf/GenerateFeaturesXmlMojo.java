@@ -182,7 +182,7 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 			for (final org.apache.maven.artifact.Artifact art : project.getArtifacts()) {
 				if (!dependency.getGroupId().equals(art.getGroupId())) { continue; }
 				if (!dependency.getArtifactId().equals(art.getArtifactId())) { continue; }
-				if (!dependency.getVersion().equals(art.getVersion())) { continue; }
+				if (!dependency.getVersion().equals(art.getBaseVersion())) { continue; }
 				if (!dependency.getType().equals(art.getType())) { continue; }
 				if (dependency.getClassifier() == null && art.getClassifier() != null) { continue; }
 				if (dependency.getClassifier() != null && !dependency.getClassifier().equals(art.getClassifier())) { continue; }

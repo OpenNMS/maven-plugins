@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="Vaadin">
+    <feature name="vaadin" version="6.7.3">
+        <feature>http-whiteboard</feature>
+        <bundle>mvn:com.vaadin/vaadin/6.7.3</bundle>
+    </feature>
+</features>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="features-with-versions">
+    <feature version="1.0-SNAPSHOT" name="features-with-versions">
+      <feature version="2.2.7">http</feature>
+      <feature version="2.2.7">http-whiteboard</feature>
+    </feature>
+</features>

@@ -17,6 +17,8 @@
     <module>20dependencies</module>
     <module>21feature-dependencies</module>
     <module>22invalid-dependencies</module>
+    <module>30configfile</module>
+    <module>31config</module>
   </modules>
 
   <build>

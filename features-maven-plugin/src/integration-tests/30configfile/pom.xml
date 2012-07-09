@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>org.opennms.maven.plugins.features</groupId>
+    <artifactId>integration-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.opennms.maven.plugins.features.integration-tests</groupId>
+  <artifactId>configfile</artifactId>
+
+  <packaging>pom</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.opennms.maven.plugins</groupId>
+        <artifactId>features-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals><goal>generate-features-xml</goal></goals>
+          </execution>
+        </executions>
+        <configuration>
+          <configfiles>
+            <configfile>
+              <location>mvn:com.example/example-config/1.0/cfg</location>
+              <finalname>/etc/example.cfg</finalname>
+            </configfile>
+          </configfiles>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

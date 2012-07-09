@@ -96,6 +96,10 @@ public class FeatureBuilder {
 	}
 
 	public static boolean isEmpty(final Feature feature) {
-		return (feature.getBundle().isEmpty() && feature.getConfig().isEmpty() && feature.getDependencies().isEmpty() && feature.getFeature().isEmpty());
+		return (
+			feature.getConfig().isEmpty() &&
+			feature.getConfigfile().isEmpty() &&
+			feature.getBundle().isEmpty() &&
+			feature.getFeature().isEmpty());
 	}
 }

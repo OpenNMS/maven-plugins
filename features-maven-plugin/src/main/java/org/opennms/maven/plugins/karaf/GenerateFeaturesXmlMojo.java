@@ -90,6 +90,17 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
      */
 	private File outputFile;
 
+	/**
+	 * Configuration entries to include in the generated features.xml file.
+	 * @parameter
+	 */
+	private List<Config> configs;
+	/**
+	 * Configuration file references to include in the generated features.xml file.
+	 * @parameter
+	 */
+	private List<Configfile> configfiles;
+
     /**
      * Features to include in the generated features.xml file.
      * @parameter
@@ -116,6 +127,8 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
     	}
     	projectFeatureBuilder.setDetails(project.getDescription());
 
+    	addConfigFromConfiguration(projectFeatureBuilder);
+    	addConfigfileFromConfiguration(projectFeatureBuilder);
     	addFeaturesFromConfiguration(projectFeatureBuilder);
     	addBundlesFromConfiguration(projectFeatureBuilder);
     	addDependenciesFromMaven(featuresBuilder, projectFeatureBuilder);
@@ -141,6 +154,26 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 		
 		projectHelper.attachArtifact(project, "xml", "features", outputFile);
     }
+	
+	void addConfigFromConfiguration(final FeatureBuilder featureBuilder) {
+		getLog().debug("checking for config entries in the <configuration> tag");
+		if (configs != null) {
+			for (final Config config : configs) {
+				getLog().debug("found config " + config);
+				featureBuilder.addConfig(config.getName(), config.getContents());
+			}
+		}
+	}
+
+	void addConfigfileFromConfiguration(final FeatureBuilder featureBuilder) {
+		getLog().debug("checking for configfiles in the <configuration> tag");
+		if (configfiles != null) {
+			for (final Configfile configfile : configfiles) {
+				getLog().debug("found configfile " + configfile);
+				featureBuilder.addConfigFile(configfile.getLocation(), configfile.getFinalname());
+			}
+		}
+	}
 
 	void addFeaturesFromConfiguration(final FeatureBuilder featureBuilder) {
 		getLog().debug("checking for features in the <configuration> tag");

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="configfile">
+    <feature version="1.0-SNAPSHOT" name="configfile">
+      <configfile finalname="/etc/example.cfg">mvn:com.example/example-config/1.0/cfg</configfile>
+    </feature>
+</features>

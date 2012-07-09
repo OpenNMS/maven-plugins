@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="config">
+    <feature version="1.0-SNAPSHOT" name="config">
+      <config name="org.ops4j.pax.web">org.osgi.service.http.port=8181</config>
+    </feature>
+</features>

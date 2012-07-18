@@ -8,6 +8,7 @@ import org.apache.karaf.features.internal.model.Features;
 
 public class FeaturesBuilder {
 	private String m_name;
+	private List<String> m_repositories = new ArrayList<String>();
 	private List<Feature> m_features = new ArrayList<Feature>();
 
 	public FeaturesBuilder() {
@@ -19,6 +20,11 @@ public class FeaturesBuilder {
 
 	public FeaturesBuilder setName(final String name) {
 		m_name = name;
+		return this;
+	}
+
+	public FeaturesBuilder addRepository(final String repository) {
+		m_repositories.add(repository);
 		return this;
 	}
 
@@ -47,6 +53,10 @@ public class FeaturesBuilder {
 	public Features getFeatures() {
 		final Features features = new Features();
 		features.setName(m_name);
+		
+		for (final String repository : m_repositories) {
+			features.getRepository().add(repository);
+		}
 
 		for (final Feature feature : m_features) {
 			if (!FeatureBuilder.isEmpty(feature)) {

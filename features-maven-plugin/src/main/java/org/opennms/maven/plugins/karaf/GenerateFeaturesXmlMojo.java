@@ -91,6 +91,12 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 	private File outputFile;
 
 	/**
+	 * Repository entries to include in the generated features.xml file.
+	 * @parameter
+	 */
+	private List<String> repositories;
+
+	/**
 	 * Configuration entries to include in the generated features.xml file.
 	 * @parameter
 	 */
@@ -127,6 +133,7 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
     	}
     	projectFeatureBuilder.setDetails(project.getDescription());
 
+    	addRepositoriesFromConfiguration(featuresBuilder);
     	addConfigFromConfiguration(projectFeatureBuilder);
     	addConfigfileFromConfiguration(projectFeatureBuilder);
     	addFeaturesFromConfiguration(projectFeatureBuilder);
@@ -154,6 +161,16 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 		
 		projectHelper.attachArtifact(project, "xml", "features", outputFile);
     }
+	
+	void addRepositoriesFromConfiguration(final FeaturesBuilder featuresBuilder) {
+		getLog().debug("checking for repository entries in the <configuration> tag");
+		if (repositories != null) {
+			for (final String repository : repositories) {
+				getLog().debug("found repository " + repository);
+				featuresBuilder.addRepository(repository);
+			}
+		}
+	}
 	
 	void addConfigFromConfiguration(final FeatureBuilder featureBuilder) {
 		getLog().debug("checking for config entries in the <configuration> tag");

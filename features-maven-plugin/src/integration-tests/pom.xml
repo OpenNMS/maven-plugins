@@ -19,6 +19,7 @@
     <module>22invalid-dependencies</module>
     <module>30configfile</module>
     <module>31config</module>
+    <module>40repository</module>
   </modules>
 
   <build>

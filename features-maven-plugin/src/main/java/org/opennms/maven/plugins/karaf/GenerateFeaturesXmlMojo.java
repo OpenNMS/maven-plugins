@@ -28,8 +28,6 @@
 
 package org.opennms.maven.plugins.karaf;
 
-import static org.apache.karaf.deployer.kar.KarArtifactInstaller.FEATURE_CLASSIFIER;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -42,11 +40,6 @@ import java.util.jar.JarFile;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.karaf.features.BundleInfo;
-import org.apache.karaf.features.internal.model.Feature;
-import org.apache.karaf.features.internal.model.Features;
-import org.apache.karaf.features.internal.model.JaxbUtil;
-import org.apache.karaf.tooling.features.ManifestUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -54,6 +47,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.util.IOUtil;
+import org.opennms.maven.plugins.karaf.model.BundleInfo;
+import org.opennms.maven.plugins.karaf.model.internal.Feature;
+import org.opennms.maven.plugins.karaf.model.internal.Features;
+import org.opennms.maven.plugins.karaf.model.internal.JaxbUtil;
 
 /**
  * Goal which generates a karaf features.xml from maven
@@ -349,7 +346,7 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 	}
 
 	private boolean isFeature(final Artifact artifact) {
-		if ("kar".equals(artifact.getType()) || FEATURE_CLASSIFIER.equals(artifact.getClassifier())) {
+		if ("kar".equals(artifact.getType()) || "features".equals(artifact.getClassifier())) {
 			return true;
 		}
 		return false;

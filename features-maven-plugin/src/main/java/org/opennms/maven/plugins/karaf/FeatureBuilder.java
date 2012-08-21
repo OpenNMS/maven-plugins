@@ -1,10 +1,10 @@
 package org.opennms.maven.plugins.karaf;
 
-import org.apache.karaf.features.internal.model.Bundle;
-import org.apache.karaf.features.internal.model.Config;
-import org.apache.karaf.features.internal.model.ConfigFile;
-import org.apache.karaf.features.internal.model.Dependency;
-import org.apache.karaf.features.internal.model.Feature;
+import org.opennms.maven.plugins.karaf.model.internal.Bundle;
+import org.opennms.maven.plugins.karaf.model.internal.Config;
+import org.opennms.maven.plugins.karaf.model.internal.ConfigFile;
+import org.opennms.maven.plugins.karaf.model.internal.Dependency;
+import org.opennms.maven.plugins.karaf.model.internal.Feature;
 
 
 public class FeatureBuilder {

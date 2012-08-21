@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.apache.karaf.features.BundleInfo;
-import org.apache.karaf.features.ConfigFileInfo;
-import org.apache.karaf.features.Dependency;
-import org.apache.karaf.features.internal.model.Config;
+import org.opennms.maven.plugins.karaf.model.BundleInfo;
+import org.opennms.maven.plugins.karaf.model.ConfigFileInfo;
+import org.opennms.maven.plugins.karaf.model.Dependency;
+import org.opennms.maven.plugins.karaf.model.internal.Config;
 import org.junit.Test;
 
 public class FeatureBuilderTest {

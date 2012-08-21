@@ -3,8 +3,8 @@ package org.opennms.maven.plugins.karaf;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.karaf.features.internal.model.Feature;
-import org.apache.karaf.features.internal.model.Features;
+import org.opennms.maven.plugins.karaf.model.internal.Feature;
+import org.opennms.maven.plugins.karaf.model.internal.Features;
 
 public class FeaturesBuilder {
 	private String m_name;

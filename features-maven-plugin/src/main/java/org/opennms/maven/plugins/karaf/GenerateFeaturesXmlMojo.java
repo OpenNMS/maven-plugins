@@ -87,6 +87,27 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
      */
 	private File outputFile;
 
+    /**
+     * Fetch the contents of all referenced repositories and include their contents
+     * in this feature repository.
+     * @parameter
+     */
+	private boolean importRepositories;
+
+	/**
+	 * Repository entries to skip when importing repository features into the current repository.
+	 * The value can either be the name of the repository or the fully-qualified URL of the feature
+	 * XML resource.
+	 * @parameter
+	 */
+	private List<String> importRepositoryExclusions;
+
+    /**
+     * Name for the repository. This defaults to the artifact-id of the project.
+     * @parameter
+     */
+	private String name;
+
 	/**
 	 * Repository entries to include in the generated features.xml file.
 	 * @parameter
@@ -123,9 +144,16 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 	private List<String> ignoredScopes;
 
 	public void execute() throws MojoExecutionException {
-    	final FeaturesBuilder featuresBuilder = new FeaturesBuilder(project.getArtifactId());
-    	final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(project.getArtifactId(), project.getVersion());
-    	if (project.getName() != project.getArtifactId()) {
+		// TODO: This doesn't seem to work... figure out how to get the mvn URL handler working
+    	// System.setProperty("java.protocol.handler.pkgs", "org.ops4j.pax.url");
+		String nameValue = (name == null || "".equals(name)) ? project.getArtifactId() : name;
+    	final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue);
+    	final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(nameValue, project.getVersion());
+    	if (importRepositories) {
+    		featuresBuilder.setImportRepositories(true);
+    		featuresBuilder.setImportRepositoryExclusions(importRepositoryExclusions);
+    	}
+    	if (project.getName() != nameValue) {
     		projectFeatureBuilder.setDescription(project.getName());
     	}
     	projectFeatureBuilder.setDetails(project.getDescription());
@@ -159,7 +187,7 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
 		projectHelper.attachArtifact(project, "xml", "features", outputFile);
     }
 	
-	void addRepositoriesFromConfiguration(final FeaturesBuilder featuresBuilder) {
+	void addRepositoriesFromConfiguration(final FeaturesBuilder featuresBuilder) throws MojoExecutionException {
 		getLog().debug("checking for repository entries in the <configuration> tag");
 		if (repositories != null) {
 			for (final String repository : repositories) {

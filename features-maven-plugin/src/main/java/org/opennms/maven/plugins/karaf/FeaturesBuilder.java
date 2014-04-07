@@ -47,7 +47,13 @@ public class FeaturesBuilder {
 			try {
 				// TODO: Figure out how to use Java's default URL scheme handling instead of
 				// manually specifying the pax-url-mvn Handler()
-				stream = new URL(null, repository, new Handler()).openStream();
+				if (repository.startsWith("mvn:")) {
+					stream = new URL(null, repository, new Handler()).openStream();
+				} else if (repository.startsWith("file:")) {
+					stream = new URL(repository).openStream();
+				} else {
+					throw new MalformedURLException("Cannot handle this URL scheme: " + repository);
+				}
 			} catch (MalformedURLException e) {
 				throw new MojoExecutionException("Could not load URL: " + repository, e);
 			} catch (IOException e) {

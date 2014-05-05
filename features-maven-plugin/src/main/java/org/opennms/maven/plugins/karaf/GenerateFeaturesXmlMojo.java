@@ -63,7 +63,7 @@ import org.opennms.maven.plugins.karaf.model.internal.JaxbUtil;
 public class GenerateFeaturesXmlMojo extends AbstractMojo {
     static final List<String> DEFAULT_IGNORED_SCOPES = Collections.unmodifiableList(Arrays.asList(new String[] {"test", "provided"}));
 
-	/**
+    /**
      * (wrapper) The maven project.
      *
      * @parameter expression="${project}"
@@ -85,314 +85,314 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
      * Location of the file.
      * @parameter expression="${project.build.directory}/features/features.xml"
      */
-	private File outputFile;
+    private File outputFile;
 
     /**
      * Fetch the contents of all referenced repositories and include their contents
      * in this feature repository.
      * @parameter
      */
-	private boolean importRepositories;
+    private boolean importRepositories;
 
-	/**
-	 * Repository entries to skip when importing repository features into the current repository.
-	 * The value can either be the name of the repository or the fully-qualified URL of the feature
-	 * XML resource.
-	 * @parameter
-	 */
-	private List<String> importRepositoryExclusions;
+    /**
+     * Repository entries to skip when importing repository features into the current repository.
+     * The value can either be the name of the repository or the fully-qualified URL of the feature
+     * XML resource.
+     * @parameter
+     */
+    private List<String> importRepositoryExclusions;
 
     /**
      * Name for the repository. This defaults to the artifact-id of the project.
      * @parameter
      */
-	private String name;
+    private String name;
 
-	/**
-	 * Repository entries to include in the generated features.xml file.
-	 * @parameter
-	 */
-	private List<String> repositories;
+    /**
+     * Repository entries to include in the generated features.xml file.
+     * @parameter
+     */
+    private List<String> repositories;
 
-	/**
-	 * Configuration entries to include in the generated features.xml file.
-	 * @parameter
-	 */
-	private List<Config> configs;
-	/**
-	 * Configuration file references to include in the generated features.xml file.
-	 * @parameter
-	 */
-	private List<Configfile> configfiles;
+    /**
+     * Configuration entries to include in the generated features.xml file.
+     * @parameter
+     */
+    private List<Config> configs;
+    /**
+     * Configuration file references to include in the generated features.xml file.
+     * @parameter
+     */
+    private List<Configfile> configfiles;
 
     /**
      * Features to include in the generated features.xml file.
      * @parameter
      */
-	private List<String> features;
+    private List<String> features;
 
     /**
      * Bundles to include in the generated features.xml file.
      * @parameter
      */
-	private List<String> bundles;
-	
-	/**
-	 * Scopes to ignore when processing dependencies.
-	 * @parameter
-	 */
-	private List<String> ignoredScopes;
+    private List<String> bundles;
 
-	public void execute() throws MojoExecutionException {
-		// TODO: This doesn't seem to work... figure out how to get the mvn URL handler working
-    	// System.setProperty("java.protocol.handler.pkgs", "org.ops4j.pax.url");
-		String nameValue = (name == null || "".equals(name)) ? project.getArtifactId() : name;
-    	final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue);
-    	final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(nameValue, project.getVersion());
-    	if (importRepositories) {
-    		featuresBuilder.setImportRepositories(true);
-    		featuresBuilder.setImportRepositoryExclusions(importRepositoryExclusions);
-    	}
-    	if (project.getName() != nameValue) {
-    		projectFeatureBuilder.setDescription(project.getName());
-    	}
-    	projectFeatureBuilder.setDetails(project.getDescription());
+    /**
+     * Scopes to ignore when processing dependencies.
+     * @parameter
+     */
+    private List<String> ignoredScopes;
 
-    	addRepositoriesFromConfiguration(featuresBuilder);
-    	addConfigFromConfiguration(projectFeatureBuilder);
-    	addConfigfileFromConfiguration(projectFeatureBuilder);
-    	addFeaturesFromConfiguration(projectFeatureBuilder);
-    	addBundlesFromConfiguration(projectFeatureBuilder);
-    	addDependenciesFromMaven(featuresBuilder, projectFeatureBuilder);
+    public void execute() throws MojoExecutionException {
+        // TODO: This doesn't seem to work... figure out how to get the mvn URL handler working
+        // System.setProperty("java.protocol.handler.pkgs", "org.ops4j.pax.url");
+        String nameValue = (name == null || "".equals(name)) ? project.getArtifactId() : name;
+        final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue);
+        final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(nameValue, project.getVersion());
+        if (importRepositories) {
+            featuresBuilder.setImportRepositories(true);
+            featuresBuilder.setImportRepositoryExclusions(importRepositoryExclusions);
+        }
+        if (project.getName() != nameValue) {
+            projectFeatureBuilder.setDescription(project.getName());
+        }
+        projectFeatureBuilder.setDetails(project.getDescription());
 
-    	final Features features = featuresBuilder.getFeatures();
+        addRepositoriesFromConfiguration(featuresBuilder);
+        addConfigFromConfiguration(projectFeatureBuilder);
+        addConfigfileFromConfiguration(projectFeatureBuilder);
+        addFeaturesFromConfiguration(projectFeatureBuilder);
+        addBundlesFromConfiguration(projectFeatureBuilder);
+        addDependenciesFromMaven(featuresBuilder, projectFeatureBuilder);
 
-    	if (projectFeatureBuilder.isEmpty()) {
-    		features.getFeature().remove(projectFeatureBuilder.getFeature());
-    	}
+        final Features features = featuresBuilder.getFeatures();
 
-    	FileWriter writer = null;
-		try {
-			outputFile.getParentFile().mkdirs();
-			writer = new FileWriter(outputFile);
-			JaxbUtil.marshal(features, writer);
-		} catch (final IOException e) {
-			throw new MojoExecutionException("Unable to open outputFile (" + outputFile + ") for writing.", e);
-		} catch (final JAXBException e) {
-			throw new MojoExecutionException("Unable to marshal the feature XML to outputFile (" + outputFile + ")", e);
-		} finally {
-			IOUtil.close(writer);
-		}
-		
-		projectHelper.attachArtifact(project, "xml", "features", outputFile);
+        if (projectFeatureBuilder.isEmpty()) {
+            features.getFeature().remove(projectFeatureBuilder.getFeature());
+        }
+
+        FileWriter writer = null;
+        try {
+            outputFile.getParentFile().mkdirs();
+            writer = new FileWriter(outputFile);
+            JaxbUtil.marshal(features, writer);
+        } catch (final IOException e) {
+            throw new MojoExecutionException("Unable to open outputFile (" + outputFile + ") for writing.", e);
+        } catch (final JAXBException e) {
+            throw new MojoExecutionException("Unable to marshal the feature XML to outputFile (" + outputFile + ")", e);
+        } finally {
+            IOUtil.close(writer);
+        }
+
+        projectHelper.attachArtifact(project, "xml", "features", outputFile);
     }
-	
-	void addRepositoriesFromConfiguration(final FeaturesBuilder featuresBuilder) throws MojoExecutionException {
-		getLog().debug("checking for repository entries in the <configuration> tag");
-		if (repositories != null) {
-			for (final String repository : repositories) {
-				getLog().debug("found repository " + repository);
-				featuresBuilder.addRepository(repository);
-			}
-		}
-	}
-	
-	void addConfigFromConfiguration(final FeatureBuilder featureBuilder) {
-		getLog().debug("checking for config entries in the <configuration> tag");
-		if (configs != null) {
-			for (final Config config : configs) {
-				getLog().debug("found config " + config);
-				featureBuilder.addConfig(config.getName(), config.getContents());
-			}
-		}
-	}
 
-	void addConfigfileFromConfiguration(final FeatureBuilder featureBuilder) {
-		getLog().debug("checking for configfiles in the <configuration> tag");
-		if (configfiles != null) {
-			for (final Configfile configfile : configfiles) {
-				getLog().debug("found configfile " + configfile);
-				featureBuilder.addConfigFile(configfile.getLocation(), configfile.getFinalname());
-			}
-		}
-	}
+    void addRepositoriesFromConfiguration(final FeaturesBuilder featuresBuilder) throws MojoExecutionException {
+        getLog().debug("checking for repository entries in the <configuration> tag");
+        if (repositories != null) {
+            for (final String repository : repositories) {
+                getLog().debug("found repository " + repository);
+                featuresBuilder.addRepository(repository);
+            }
+        }
+    }
 
-	void addFeaturesFromConfiguration(final FeatureBuilder featureBuilder) {
-		getLog().debug("checking for features in the <configuration> tag");
-		if (features != null) {
-	    	for (final String feature : features) {
-	    		getLog().debug("found feature " + feature);
-	    		addFeature(featureBuilder, feature);
-	    	}
-    	}
-	}
+    void addConfigFromConfiguration(final FeatureBuilder featureBuilder) {
+        getLog().debug("checking for config entries in the <configuration> tag");
+        if (configs != null) {
+            for (final Config config : configs) {
+                getLog().debug("found config " + config);
+                featureBuilder.addConfig(config.getName(), config.getContents());
+            }
+        }
+    }
 
-	void addBundlesFromConfiguration(final FeatureBuilder featureBuilder) throws MojoExecutionException {
-		getLog().debug("checking for bundles in the <configuration> tag");
-		if (bundles != null) {
-	    	for (final String bundle : bundles) {
-	    		getLog().debug("found bundle " + bundle);
-	    		addBundle(featureBuilder, bundle);
-	    	}
-    	}
-	}
+    void addConfigfileFromConfiguration(final FeatureBuilder featureBuilder) {
+        getLog().debug("checking for configfiles in the <configuration> tag");
+        if (configfiles != null) {
+            for (final Configfile configfile : configfiles) {
+                getLog().debug("found configfile " + configfile);
+                featureBuilder.addConfigFile(configfile.getLocation(), configfile.getFinalname());
+            }
+        }
+    }
 
-	void addDependenciesFromMaven(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder) throws MojoExecutionException {
-		getLog().debug("project = " + project);
+    void addFeaturesFromConfiguration(final FeatureBuilder featureBuilder) {
+        getLog().debug("checking for features in the <configuration> tag");
+        if (features != null) {
+            for (final String feature : features) {
+                getLog().debug("found feature " + feature);
+                addFeature(featureBuilder, feature);
+            }
+        }
+    }
 
-		addLocalDependencies(featuresBuilder, projectFeatureBuilder, project);
-	}
+    void addBundlesFromConfiguration(final FeatureBuilder featureBuilder) throws MojoExecutionException {
+        getLog().debug("checking for bundles in the <configuration> tag");
+        if (bundles != null) {
+            for (final String bundle : bundles) {
+                getLog().debug("found bundle " + bundle);
+                addBundle(featureBuilder, bundle);
+            }
+        }
+    }
 
-	void addLocalDependencies(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder, final MavenProject project) throws MojoExecutionException {
-        
-		for (final Dependency dependency : project.getDependencies()) {
-			getLog().debug("getting artifact for dependency " + dependency);
+    void addDependenciesFromMaven(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder) throws MojoExecutionException {
+        getLog().debug("project = " + project);
 
-			if (getIgnoredScopes().contains(dependency.getScope())) {
-        		getLog().debug("Dependency " + dependency + " is in scope: " + dependency.getScope() + ", ignoring.");
-        		continue;
-			}
+        addLocalDependencies(featuresBuilder, projectFeatureBuilder, project);
+    }
 
-			org.apache.maven.artifact.Artifact matched = null;
-			for (final org.apache.maven.artifact.Artifact art : project.getArtifacts()) {
-				if (!dependency.getGroupId().equals(art.getGroupId())) { continue; }
-				if (!dependency.getArtifactId().equals(art.getArtifactId())) { continue; }
-				if (!dependency.getVersion().equals(art.getBaseVersion())) { continue; }
-				if (!dependency.getType().equals(art.getType())) { continue; }
-				if (dependency.getClassifier() == null && art.getClassifier() != null) { continue; }
-				if (dependency.getClassifier() != null && !dependency.getClassifier().equals(art.getClassifier())) { continue; }
+    void addLocalDependencies(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder, final MavenProject project) throws MojoExecutionException {
 
-				matched = art;
-				break;
-			}
-			
-			if (matched == null) {
-				throw new MojoExecutionException("Unable to match artifact for dependency: " + dependency);
-			} else {
-				getLog().debug("Found match for dependency: " + dependency);
-				try {
-					addBundleArtifact(featuresBuilder, projectFeatureBuilder, matched);
-				} catch (final Exception e) {
-					throw new MojoExecutionException("An error occurred while adding artifact " + matched + " to the features file.", e);
-				}
-			}
-		}
-		
-	}
+        for (final Dependency dependency : project.getDependencies()) {
+            getLog().debug("getting artifact for dependency " + dependency);
 
-	void addFeature(final FeatureBuilder featureBuilder, final String feature) {
-		getLog().debug("addFeature: " + feature);
+            if (getIgnoredScopes().contains(dependency.getScope())) {
+                getLog().debug("Dependency " + dependency + " is in scope: " + dependency.getScope() + ", ignoring.");
+                continue;
+            }
 
-		if (feature.contains("/")) {
-			final String[] featureInfo = feature.split("/");
-			if (featureInfo == null || featureInfo.length != 2) {
-				getLog().debug("Invalid feature '" + feature + "'. Must be just a feature name, or feature/version.");
-			} else {
-				featureBuilder.addFeature(featureInfo[0], featureInfo[1]);
-			}
-		} else {
-			// no version specified, add directly
-			featureBuilder.addFeature(feature);
-		}
-	}
-	
-	void addBundle(final FeatureBuilder featureBuilder, final String bundle) throws MojoExecutionException {
-		getLog().debug("addBundle: " + bundle);
+            org.apache.maven.artifact.Artifact matched = null;
+            for (final org.apache.maven.artifact.Artifact art : project.getArtifacts()) {
+                if (!dependency.getGroupId().equals(art.getGroupId())) { continue; }
+                if (!dependency.getArtifactId().equals(art.getArtifactId())) { continue; }
+                if (!dependency.getVersion().equals(art.getBaseVersion())) { continue; }
+                if (!dependency.getType().equals(art.getType())) { continue; }
+                if (dependency.getClassifier() == null && art.getClassifier() != null) { continue; }
+                if (dependency.getClassifier() != null && !dependency.getClassifier().equals(art.getClassifier())) { continue; }
 
-		if (bundle.contains("@")) {
-			final String[] bundleInfo = bundle.split("@");
-			if (bundleInfo == null || bundleInfo.length != 2) {
-				getLog().debug("Invalid bundle '" + bundle + "'. Must be a bundle specification, optionally followed by @ and an integer start level.");
-			} else {
-				final Integer startLevel;
-				try {
-					startLevel = Integer.valueOf(bundleInfo[1]);
-				} catch (final NumberFormatException e) {
-					throw new MojoExecutionException("Bundle specification ('" + bundle + "') contained a start level, but it was unparseable.");
-				}
-				featureBuilder.addBundle(bundleInfo[0], startLevel);
-			}
-		} else {
-			
-			// no startLevel specified
-			featureBuilder.addBundle(bundle);
-		}
-	}
+                matched = art;
+                break;
+            }
 
-	void addBundleArtifact(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder, final Artifact artifact) throws IOException, JAXBException, MojoExecutionException {
-		getLog().debug("addBundleArtifact: " + artifact);
+            if (matched == null) {
+                throw new MojoExecutionException("Unable to match artifact for dependency: " + dependency);
+            } else {
+                getLog().debug("Found match for dependency: " + dependency);
+                try {
+                    addBundleArtifact(featuresBuilder, projectFeatureBuilder, matched);
+                } catch (final Exception e) {
+                    throw new MojoExecutionException("An error occurred while adding artifact " + matched + " to the features file.", e);
+                }
+            }
+        }
 
-		final File file = artifact.getFile();
-		JarFile jf = null;
-		try {
-			jf = new JarFile(file);
-		} catch (final Exception e) {
-			// we just want to see if it's something with a manifest, ignore zip failures
-		}
+    }
 
-		if (isFeature(artifact)) {
-			final Features features = readFeaturesFile(file);
-			for (final Feature feature : features.getFeature()) {
-				if (projectFeatureBuilder.getFeature().getName().equals(feature.getName())) {
-					getLog().warn("addBundleArtifact: Found feature named '" + feature.getName() + "' in artifact '" + artifact + "', but we already have a feature with that name.  Skipping.");
-				} else {
-					getLog().info("addBundleArtifact: Including feature '" + feature.getName() + "' from " + artifact);
-					featuresBuilder.addFeature(feature);
-				}
-			}
-		} else if ("pom".equals(artifact.getType())) {
-			getLog().debug("addBundleArtifact: " + artifact + " is a POM.  Skipping.");
-			// skip POM dependencies that aren't features
-			return;
-		} else if (jf != null && jf.getManifest() != null && ManifestUtils.isBundle(jf.getManifest())) {
-			final String bundleName = MavenUtil.artifactToMvn(artifact);
-			projectFeatureBuilder.addBundle(bundleName);
-		} else {
-			boolean found = false;
+    void addFeature(final FeatureBuilder featureBuilder, final String feature) {
+        getLog().debug("addFeature: " + feature);
 
-			for (final BundleInfo bundle : projectFeatureBuilder.getFeature().getBundles()) {
-				final Artifact bundleArtifact = MavenUtil.mvnToArtifact(bundle.getLocation().replace("wrap:", ""));
-				if (bundleArtifact != null && bundleArtifact.toString().equals(artifact.toString())) {
-					found = true;
-					break;
-				}
-			}
-			
-			if (!found) {
-				throw new MojoExecutionException("artifact " + artifact + " is not a bundle!");
-			} else {
-				getLog().debug("Added a non-bundle artifact, but it's already defined in the <bundles> configuration.  Skipping.");
-			}
-		}
-	}
+        if (feature.contains("/")) {
+            final String[] featureInfo = feature.split("/");
+            if (featureInfo == null || featureInfo.length != 2) {
+                getLog().debug("Invalid feature '" + feature + "'. Must be just a feature name, or feature/version.");
+            } else {
+                featureBuilder.addFeature(featureInfo[0], featureInfo[1]);
+            }
+        } else {
+            // no version specified, add directly
+            featureBuilder.addFeature(feature);
+        }
+    }
 
-	List<String> getIgnoredScopes() {
-		if (ignoredScopes == null) {
-			return DEFAULT_IGNORED_SCOPES;
-		}
-		return ignoredScopes;
-	}
+    void addBundle(final FeatureBuilder featureBuilder, final String bundle) throws MojoExecutionException {
+        getLog().debug("addBundle: " + bundle);
 
-	private boolean isFeature(final Artifact artifact) {
-		if ("kar".equals(artifact.getType()) || "features".equals(artifact.getClassifier())) {
-			return true;
-		}
-		return false;
-	}
+        if (bundle.contains("@")) {
+            final String[] bundleInfo = bundle.split("@");
+            if (bundleInfo == null || bundleInfo.length != 2) {
+                getLog().debug("Invalid bundle '" + bundle + "'. Must be a bundle specification, optionally followed by @ and an integer start level.");
+            } else {
+                final Integer startLevel;
+                try {
+                    startLevel = Integer.valueOf(bundleInfo[1]);
+                } catch (final NumberFormatException e) {
+                    throw new MojoExecutionException("Bundle specification ('" + bundle + "') contained a start level, but it was unparseable.");
+                }
+                featureBuilder.addBundle(bundleInfo[0], startLevel);
+            }
+        } else {
 
-	private Features readFeaturesFile(final File featuresFile) throws JAXBException, IOException {
+            // no startLevel specified
+            featureBuilder.addBundle(bundle);
+        }
+    }
+
+    void addBundleArtifact(final FeaturesBuilder featuresBuilder, final FeatureBuilder projectFeatureBuilder, final Artifact artifact) throws IOException, JAXBException, MojoExecutionException {
+        getLog().debug("addBundleArtifact: " + artifact);
+
+        final File file = artifact.getFile();
+        JarFile jf = null;
+        try {
+            jf = new JarFile(file);
+        } catch (final Exception e) {
+            // we just want to see if it's something with a manifest, ignore zip failures
+        }
+
+        if (isFeature(artifact)) {
+            final Features features = readFeaturesFile(file);
+            for (final Feature feature : features.getFeature()) {
+                if (projectFeatureBuilder.getFeature().getName().equals(feature.getName())) {
+                    getLog().warn("addBundleArtifact: Found feature named '" + feature.getName() + "' in artifact '" + artifact + "', but we already have a feature with that name.  Skipping.");
+                } else {
+                    getLog().info("addBundleArtifact: Including feature '" + feature.getName() + "' from " + artifact);
+                    featuresBuilder.addFeature(feature);
+                }
+            }
+        } else if ("pom".equals(artifact.getType())) {
+            getLog().debug("addBundleArtifact: " + artifact + " is a POM.  Skipping.");
+            // skip POM dependencies that aren't features
+            return;
+        } else if (jf != null && jf.getManifest() != null && ManifestUtils.isBundle(jf.getManifest())) {
+            final String bundleName = MavenUtil.artifactToMvn(artifact);
+            projectFeatureBuilder.addBundle(bundleName);
+        } else {
+            boolean found = false;
+
+            for (final BundleInfo bundle : projectFeatureBuilder.getFeature().getBundles()) {
+                final Artifact bundleArtifact = MavenUtil.mvnToArtifact(bundle.getLocation().replace("wrap:", ""));
+                if (bundleArtifact != null && bundleArtifact.toString().equals(artifact.toString())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                throw new MojoExecutionException("artifact " + artifact + " is not a bundle!");
+            } else {
+                getLog().debug("Added a non-bundle artifact, but it's already defined in the <bundles> configuration.  Skipping.");
+            }
+        }
+    }
+
+    List<String> getIgnoredScopes() {
+        if (ignoredScopes == null) {
+            return DEFAULT_IGNORED_SCOPES;
+        }
+        return ignoredScopes;
+    }
+
+    private boolean isFeature(final Artifact artifact) {
+        if ("kar".equals(artifact.getType()) || "features".equals(artifact.getClassifier())) {
+            return true;
+        }
+        return false;
+    }
+
+    private Features readFeaturesFile(final File featuresFile) throws JAXBException, IOException {
         Features features = null;
         InputStream in = null;
         try {
-        	in = new FileInputStream(featuresFile);
+            in = new FileInputStream(featuresFile);
             features = JaxbUtil.unmarshal(in, false);
         } finally {
-        	IOUtil.close(in);
+            IOUtil.close(in);
         }
         return features;
     }
 
     void setIgnoredScopes(final List<String> scopes) {
-    	ignoredScopes = scopes;
+        ignoredScopes = scopes;
     }
 }

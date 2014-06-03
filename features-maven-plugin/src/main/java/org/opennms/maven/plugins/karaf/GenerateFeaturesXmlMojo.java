@@ -143,9 +143,16 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
      */
     private List<String> ignoredScopes;
 
+    /**
+     * @parameter default-value="${localRepository}"
+     */
+    private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
+
     public void execute() throws MojoExecutionException {
-        // TODO: This doesn't seem to work... figure out how to get the mvn URL handler working
-        // System.setProperty("java.protocol.handler.pkgs", "org.ops4j.pax.url");
+        if (localRepository != null && localRepository.getBasedir() != null) {
+            System.setProperty("Dorg.ops4j.pax.url.mvn.localRepository", localRepository.getBasedir());
+        }
+
         String nameValue = (name == null || "".equals(name)) ? project.getArtifactId() : name;
         final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue);
         final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(nameValue, project.getVersion());

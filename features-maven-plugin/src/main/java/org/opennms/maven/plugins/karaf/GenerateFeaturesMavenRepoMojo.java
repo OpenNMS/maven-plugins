@@ -58,14 +58,23 @@ public class GenerateFeaturesMavenRepoMojo extends AbstractFeatureMojo {
      */
     protected List<CopyFileBasedDescriptor> copyFileBasedDescriptors;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        Set<Feature> featuresSet = resolveFeatures();
+    /**
+     * @parameter default-value="${localRepository}"
+     */
+    private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
-        for (Artifact descriptor : descriptorArtifacts) {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (localRepository != null && localRepository.getBasedir() != null) {
+            System.setProperty("Dorg.ops4j.pax.url.mvn.localRepository", localRepository.getBasedir());
+        }
+
+        final Set<Feature> featuresSet = resolveFeatures();
+
+        for (final Artifact descriptor : descriptorArtifacts) {
             copy(descriptor, repository);
         }
 
-        for (Feature feature : featuresSet) {
+        for (final Feature feature : featuresSet) {
             copyArtifactsToDestRepository(feature.getBundles());
             copyArtifactsToDestRepository(feature.getConfigFiles());
         }
@@ -74,19 +83,19 @@ public class GenerateFeaturesMavenRepoMojo extends AbstractFeatureMojo {
 
     }
 
-    private void copyArtifactsToDestRepository(List<? extends ArtifactRef> artifactRefs) throws MojoExecutionException {
-        for (ArtifactRef artifactRef : artifactRefs) {
-            Artifact artifact = artifactRef.getArtifact();
+    private void copyArtifactsToDestRepository(final List<? extends ArtifactRef> artifactRefs) throws MojoExecutionException {
+        for (final ArtifactRef artifactRef : artifactRefs) {
+            final Artifact artifact = artifactRef.getArtifact();
             if (artifact != null) {
                 copy(artifact, repository);
             }
         }
     }
 
-    protected void copy(Artifact artifact, File destRepository) {
+    protected void copy(final Artifact artifact, final File destRepository) {
         try {
             getLog().info("Copying artifact: " + artifact);
-            File destFile = new File(destRepository, getRelativePath(artifact));
+            final File destFile = new File(destRepository, getRelativePath(artifact));
             copy(artifact.getFile(), destFile);
             if (!"pom".equals(artifact.getType())) {
                 final Artifact pomArtifact = getPom(artifact);
@@ -100,13 +109,13 @@ public class GenerateFeaturesMavenRepoMojo extends AbstractFeatureMojo {
                 getLog().info("Generating metadata file: " + metadataFile);
                 MavenUtil.generateMavenMetadata(artifact, new File(destRepository, metadataFile));
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             getLog().warn("Error copying artifact " + artifact, e);
         }
     }
 
     Artifact getPom(final Artifact artifact) {
-        Artifact pomArtifact = factory.createArtifactWithClassifier(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), "pom", null);
+        final Artifact pomArtifact = factory.createArtifactWithClassifier(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), "pom", null);
         pomArtifact.setOptional(artifact.isOptional());
         pomArtifact.setRelease(artifact.isRelease());
         final File dir = artifact.getFile().getParentFile();
@@ -120,17 +129,17 @@ public class GenerateFeaturesMavenRepoMojo extends AbstractFeatureMojo {
      * @param artifact
      * @return relative path of the given artifact in a default repo layout
      */
-    private String getRelativePath(Artifact artifact) {
-        String dir = (this.flatRepoLayout) ? "" : MavenUtil.getDir(artifact);
-        String name = MavenUtil.getFileName(artifact);
+    private String getRelativePath(final Artifact artifact) {
+        final String dir = (this.flatRepoLayout) ? "" : MavenUtil.getDir(artifact);
+        final String name = MavenUtil.getFileName(artifact);
         return dir + name;
     }
 
     private void copyFileBasedDescriptorsToDestRepository() {
         if (copyFileBasedDescriptors != null) {
-            for (CopyFileBasedDescriptor fileBasedDescriptor : copyFileBasedDescriptors) {
-                File destDir = new File(repository, fileBasedDescriptor.getTargetDirectory());
-                File destFile = new File(destDir, fileBasedDescriptor.getTargetFileName());
+            for (final CopyFileBasedDescriptor fileBasedDescriptor : copyFileBasedDescriptors) {
+                final File destDir = new File(repository, fileBasedDescriptor.getTargetDirectory());
+                final File destFile = new File(destDir, fileBasedDescriptor.getTargetFileName());
                 copy(fileBasedDescriptor.getSourceFile(), destFile);
             }
         }

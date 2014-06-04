@@ -149,12 +149,13 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
     private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
     public void execute() throws MojoExecutionException {
+        String basedir = null;
         if (localRepository != null && localRepository.getBasedir() != null) {
-            System.setProperty("Dorg.ops4j.pax.url.mvn.localRepository", localRepository.getBasedir());
+            basedir = localRepository.getBasedir();
         }
 
         String nameValue = (name == null || "".equals(name)) ? project.getArtifactId() : name;
-        final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue);
+        final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue, basedir);
         final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(nameValue, project.getVersion());
         if (importRepositories) {
             featuresBuilder.setImportRepositories(true);

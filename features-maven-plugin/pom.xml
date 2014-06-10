@@ -128,6 +128,38 @@
       <version>2.0.0</version>
     </dependency>
 
+    <!-- make sure karaf-maven-plugin and pax-url-aether match -->
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>1.0.0.v20140518</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-connector-basic</artifactId>
+      <version>1.0.0.v20140518</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-impl</artifactId>
+      <version>1.0.0.v20140518</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-spi</artifactId>
+      <version>1.0.0.v20140518</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-transport-wagon</artifactId>
+      <version>1.0.0.v20140518</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>1.0.0.v20140518</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http</artifactId>

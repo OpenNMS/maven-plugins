@@ -6,10 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.opennms.maven.plugins.karaf.model.BundleInfo;
-import org.opennms.maven.plugins.karaf.model.ConfigFileInfo;
-import org.opennms.maven.plugins.karaf.model.Dependency;
-import org.opennms.maven.plugins.karaf.model.internal.Config;
+import org.apache.karaf.features.BundleInfo;
+import org.apache.karaf.features.ConfigFileInfo;
 import org.junit.Test;
 
 public class FeatureBuilderTest {
@@ -63,7 +61,7 @@ public class FeatureBuilderTest {
 	public void testFeatureWithConfig() {
 		FeatureBuilder fb = new FeatureBuilder("a");
 		fb.addConfig("name", "value = bar");
-		final List<Config> config = fb.getFeature().getConfig();
+		final List<org.apache.karaf.features.internal.model.Config> config = fb.getFeature().getConfig();
 		assertNotNull(config);
 		assertEquals(1, config.size());
 		assertEquals("name", config.get(0).getName());
@@ -88,7 +86,7 @@ public class FeatureBuilderTest {
 	public void testFeatureWithFeatureDependency() {
 		FeatureBuilder fb = new FeatureBuilder("a");
 		fb.addFeature("feature1").addFeature("feature2", "1.0");
-		final List<Dependency> deps = fb.getFeature().getDependencies();
+		final List<org.apache.karaf.features.Dependency> deps = fb.getFeature().getDependencies();
 		assertNotNull(deps);
 		assertEquals(2, deps.size());
 		assertEquals("feature1", deps.get(0).getName());

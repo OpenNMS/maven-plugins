@@ -40,6 +40,10 @@ import java.util.jar.JarFile;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.karaf.features.BundleInfo;
+import org.apache.karaf.features.internal.model.Feature;
+import org.apache.karaf.features.internal.model.Features;
+import org.apache.karaf.features.internal.model.JaxbUtil;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -47,10 +51,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.util.IOUtil;
-import org.opennms.maven.plugins.karaf.model.BundleInfo;
-import org.opennms.maven.plugins.karaf.model.internal.Feature;
-import org.opennms.maven.plugins.karaf.model.internal.Features;
-import org.opennms.maven.plugins.karaf.model.internal.JaxbUtil;
 
 /**
  * Goal which generates a karaf features.xml from maven

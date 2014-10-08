@@ -7,9 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 
-import org.opennms.maven.plugins.karaf.model.BundleInfo;
-import org.opennms.maven.plugins.karaf.model.Feature;
-import org.opennms.maven.plugins.karaf.model.internal.Dependency;
+import org.apache.karaf.features.BundleInfo;
+import org.apache.karaf.features.internal.model.Dependency;
+import org.apache.karaf.features.internal.model.Feature;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;

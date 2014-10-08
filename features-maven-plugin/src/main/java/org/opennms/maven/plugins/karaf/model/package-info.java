@@ -1,0 +1,2 @@
+@javax.xml.bind.annotation.XmlSchema(namespace = org.apache.karaf.features.FeaturesNamespaces.URI_CURRENT, elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+package org.opennms.maven.plugins.karaf.model;

@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.karaf.features.internal.model.Feature;
+import org.apache.karaf.features.internal.model.Features;
+import org.apache.karaf.features.internal.model.JaxbUtil;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.opennms.maven.plugins.karaf.model.internal.Feature;
-import org.opennms.maven.plugins.karaf.model.internal.Features;
-import org.opennms.maven.plugins.karaf.model.internal.JaxbUtil;
 import org.ops4j.pax.url.mvn.ServiceConstants;
 import org.ops4j.pax.url.mvn.internal.Connection;
 import org.ops4j.pax.url.mvn.internal.config.MavenConfigurationImpl;
@@ -120,16 +120,16 @@ public class FeaturesBuilder {
     }
 
     public Features getFeatures() {
-        final Features features = new Features();
+        final org.opennms.maven.plugins.karaf.model.Features features = new org.opennms.maven.plugins.karaf.model.Features();
         features.setName(m_name);
 
         for (final String repository : m_repositories) {
-            features.getRepository().add(repository);
+            features.addRepository(repository);
         }
 
         for (final Feature feature : m_features) {
             if (!FeatureBuilder.isEmpty(feature)) {
-                features.getFeature().add(feature);
+                features.addFeature(feature);
             }
         }
 

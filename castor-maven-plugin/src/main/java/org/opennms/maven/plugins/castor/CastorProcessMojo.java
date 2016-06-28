@@ -42,6 +42,8 @@ import org.codehaus.mojo.castor.GenerateMojo;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.twmacinta.util.MD5;
@@ -54,6 +56,7 @@ import com.twmacinta.util.MD5;
  * @description Post-process Castor-generated classes.
  * @author Benjamin Reed <ranger@opennms.org>
  */
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = false)
 public class CastorProcessMojo
     extends GenerateMojo
 {

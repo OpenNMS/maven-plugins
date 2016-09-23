@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.felix.utils.version.VersionRange;
 import org.apache.felix.utils.version.VersionTable;
@@ -35,7 +36,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.opennms.maven.plugins.karaf.utils.MojoSupport;
-import org.osgi.framework.Version;
 
 /**
  * Common functionality for mojos that need to reolve features
@@ -168,56 +168,51 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
      */
     protected void addFeatures(List<String> featureNames, Set<Feature> features, Map<String, Feature> featuresMap, boolean transitive) {
         for (String feature : featureNames) {
-            Feature f = getMatchingFeature(featuresMap, feature);
-            features.add(f);
-            if (transitive) {
-            	addFeatures(f.getDependencies(), features, featuresMap, true);
+            for (Feature f : getMatchingFeatures(featuresMap, feature)) {
+                features.add(f);
+                if (transitive) {
+                    addFeatures(f.getDependencies(), features, featuresMap, true);
+                }
             }
         }
     }
 
-    private Feature getMatchingFeature(Map<String, Feature> featuresMap, String feature) {
+    protected static Set<Feature> getMatchingFeatures(Map<String, Feature> featuresMap, String feature) {
+        final Set<Feature> matches = new HashSet<>();
+
         // feature could be only the name or name/version
-        int delimIndex = feature.indexOf('/');
+        final int delimIndex = feature.indexOf('/');
         String version = null;
         if (delimIndex > 0) {
             version = feature.substring(delimIndex + 1);
             feature = feature.substring(0, delimIndex);
         }
-        Feature f = null;
+
+        // find all features with the requested name
+        final String featureName = feature;
+        final List<Feature> candidates = featuresMap.entrySet().stream()
+            .filter(e -> featureName.equals(e.getKey().split("/")[0]))
+            .map(e -> e.getValue())
+            .collect(Collectors.toList());
+
         if (version != null) {
-            // looking for a specific feature with name and version
-            f = featuresMap.get(feature + "/" + version);
-            if (f == null) {
-                //it's probably is a version range so try to use VersionRange Utils
-                VersionRange versionRange = new VersionRange(version);
-                for (String key : featuresMap.keySet()) {
-                    String[] nameVersion = key.split("/");
-                    if (feature.equals(nameVersion[0])) {
-                        String verStr = featuresMap.get(key).getVersion();
-                        Version ver = VersionTable.getVersion(verStr);
-                        if (versionRange.contains(ver)) {
-                            if (f == null || VersionTable.getVersion(f.getVersion()).compareTo(VersionTable.getVersion(featuresMap.get(key).getVersion())) < 0) {    
-                                f = featuresMap.get(key);
-                            }
-                        }
-                    }
-                }
-            }
+            final VersionRange versionRange = new VersionRange(version);
+            // find all features with in the given range
+            candidates.stream()
+                .filter(c -> versionRange.contains(VersionTable.getVersion(c.getVersion())))
+                .forEach(c -> matches.add(c));
         } else {
-            // looking for the first feature name (whatever the version is)
-            for (String key : featuresMap.keySet()) {
-                String[] nameVersion = key.split("/");
-                if (feature.equals(nameVersion[0])) {
-                    f = featuresMap.get(key);
-                    break;
-                }
-            }
+            // find the feature with the highest version
+            candidates.stream()
+                .sorted((c1, c2) -> VersionTable.getVersion(c2.getVersion()).compareTo(VersionTable.getVersion(c1.getVersion())))
+                .findFirst()
+                .ifPresent(c -> matches.add(c));
         }
-        if (f == null) {
+
+        if (matches.size() < 1) {
             throw new IllegalArgumentException("Unable to find the feature '" + feature + "'");
         }
-        return f;
+        return matches;
     }
 
     protected Set<Feature> resolveFeatures() throws MojoExecutionException {
@@ -277,6 +272,5 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
             System.runFinalization();
         }
     }
-
 
 }

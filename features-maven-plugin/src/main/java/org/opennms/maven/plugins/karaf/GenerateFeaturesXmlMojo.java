@@ -45,12 +45,14 @@ import org.apache.karaf.features.internal.model.Feature;
 import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.IOUtil;
+import org.opennms.maven.plugins.karaf.utils.MojoSupport;
 
 /**
  * Goal which generates a karaf features.xml from maven
@@ -60,7 +62,7 @@ import org.codehaus.plexus.util.IOUtil;
  * @requiresDependencyResolution
  */
 @SuppressWarnings("restriction")
-public class GenerateFeaturesXmlMojo extends AbstractMojo {
+public class GenerateFeaturesXmlMojo extends MojoSupport {
     static final List<String> DEFAULT_IGNORED_SCOPES = Collections.unmodifiableList(Arrays.asList(new String[] {"test", "provided"}));
 
     /**
@@ -80,6 +82,24 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
      * @readonly
      */
     protected MavenProjectHelper projectHelper;
+
+    /**
+     * The maven project's session.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    protected PlexusContainer container;
+
+    /**
+     * The maven project's session.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    protected MavenSession mavenSession;
 
     /**
      * Location of the file.
@@ -149,13 +169,12 @@ public class GenerateFeaturesXmlMojo extends AbstractMojo {
     private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
     public void execute() throws MojoExecutionException {
-        String basedir = null;
         if (localRepository != null && localRepository.getBasedir() != null) {
-            basedir = localRepository.getBasedir();
+            System.setProperty("org.ops4j.pax.url.mvn.localRepository", localRepository.getBasedir());
         }
 
         String nameValue = (name == null || "".equals(name)) ? project.getArtifactId() : name;
-        final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue, basedir);
+        final FeaturesBuilder featuresBuilder = new FeaturesBuilder(nameValue, container, project, mavenSession);
         final FeatureBuilder projectFeatureBuilder = featuresBuilder.createFeature(nameValue, project.getVersion());
         if (importRepositories) {
             featuresBuilder.setImportRepositories(true);

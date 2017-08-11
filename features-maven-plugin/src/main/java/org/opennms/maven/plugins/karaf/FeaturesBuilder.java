@@ -1,32 +1,42 @@
 package org.opennms.maven.plugins.karaf;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.karaf.features.internal.model.Feature;
 import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
+import org.apache.karaf.tooling.features.DependencyHelper;
+import org.apache.karaf.tooling.features.DependencyHelperFactory;
+import org.apache.karaf.tooling.url.CustomBundleURLStreamHandlerFactory;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.ops4j.pax.url.mvn.ServiceConstants;
-import org.ops4j.pax.url.mvn.internal.Connection;
-import org.ops4j.pax.url.mvn.internal.config.MavenConfigurationImpl;
-
-import shaded.org.ops4j.util.property.PropertiesPropertyResolver;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusContainer;
 
 public class FeaturesBuilder {
     private String m_name;
-    private String m_basedir;
     private boolean m_importRepositories = false;
     private List<String> m_importRepositoryExclusions = new ArrayList<String>();
     private List<String> m_repositories = new ArrayList<String>();
     private List<Feature> m_features = new ArrayList<Feature>();
+
+    private Log m_log = new SystemStreamLog();
+
+    protected DependencyHelper dependencyHelper;
+
+    static {
+        URL.setURLStreamHandlerFactory(new CustomBundleURLStreamHandlerFactory());
+    }
 
     public FeaturesBuilder() {
     }
@@ -35,9 +45,9 @@ public class FeaturesBuilder {
         m_name = name;
     }
 
-    public FeaturesBuilder(final String name, final String basedir) {
+    public FeaturesBuilder(final String name, final PlexusContainer container, final MavenProject project, final MavenSession session) throws MojoExecutionException {
         m_name = name;
-        m_basedir = basedir;
+        this.dependencyHelper = DependencyHelperFactory.createDependencyHelper(container, project, session, m_log);
     }
 
     public FeaturesBuilder setName(final String name) {
@@ -60,7 +70,12 @@ public class FeaturesBuilder {
                 // TODO: Figure out how to use Java's default URL scheme handling instead of
                 // manually specifying the pax-url-mvn Handler()
                 if (repository.startsWith("mvn:")) {
-                    stream = new URL(null, repository, new FeaturesHandler(m_basedir)).openStream();
+                    if (this.dependencyHelper == null) {
+                        throw new MojoExecutionException("No dependency resolver initialized!");
+                    }
+                    final Artifact repositoryArtifact = dependencyHelper.mvnToArtifact(repository);
+                    final File resolved = dependencyHelper.resolve(repositoryArtifact, m_log);
+                    stream = new FileInputStream(resolved);
                 } else if (repository.startsWith("file:")) {
                     stream = new URL(repository).openStream();
                 } else {
@@ -142,25 +157,5 @@ public class FeaturesBuilder {
 
     public void setImportRepositoryExclusions(List<String> importRepositoryExclusions) {
         m_importRepositoryExclusions = importRepositoryExclusions;
-    }
-
-    public class FeaturesHandler extends URLStreamHandler {
-        private final String m_basedir;
-        public FeaturesHandler(final String basedir) {
-            m_basedir = basedir;
-        }
-
-        @Override
-        protected URLConnection openConnection(final URL u) throws IOException {
-            final Properties props = new Properties();
-            props.putAll(System.getProperties());
-            if (m_basedir != null) {
-                props.put("org.ops4j.pax.url.mvn.localRepository", m_basedir);
-            }
-
-            final PropertiesPropertyResolver propertyResolver = new PropertiesPropertyResolver( props );
-            final MavenConfigurationImpl config = new MavenConfigurationImpl( propertyResolver, ServiceConstants.PID );
-            return new Connection( u, config );
-        }
     }
 }

@@ -32,11 +32,13 @@ public class FeaturesBuilder {
 
     private Log m_log = new SystemStreamLog();
 
-    protected DependencyHelper dependencyHelper;
+    protected DependencyHelper m_dependencyHelper;
 
+    /*
     static {
         URL.setURLStreamHandlerFactory(new CustomBundleURLStreamHandlerFactory());
     }
+    */
 
     public FeaturesBuilder() {
     }
@@ -47,7 +49,7 @@ public class FeaturesBuilder {
 
     public FeaturesBuilder(final String name, final PlexusContainer container, final MavenProject project, final MavenSession session) throws MojoExecutionException {
         m_name = name;
-        this.dependencyHelper = DependencyHelperFactory.createDependencyHelper(container, project, session, m_log);
+        m_dependencyHelper = DependencyHelperFactory.createDependencyHelper(container, project, session, m_log);
     }
 
     public FeaturesBuilder setName(final String name) {
@@ -70,11 +72,11 @@ public class FeaturesBuilder {
                 // TODO: Figure out how to use Java's default URL scheme handling instead of
                 // manually specifying the pax-url-mvn Handler()
                 if (repository.startsWith("mvn:")) {
-                    if (this.dependencyHelper == null) {
+                    if (m_dependencyHelper == null) {
                         throw new MojoExecutionException("No dependency resolver initialized!");
                     }
-                    final Artifact repositoryArtifact = dependencyHelper.mvnToArtifact(repository);
-                    final File resolved = dependencyHelper.resolve(repositoryArtifact, m_log);
+                    final Artifact repositoryArtifact = m_dependencyHelper.mvnToArtifact(repository);
+                    final File resolved = m_dependencyHelper.resolve(repositoryArtifact, m_log);
                     stream = new FileInputStream(resolved);
                 } else if (repository.startsWith("file:")) {
                     stream = new URL(repository).openStream();

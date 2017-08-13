@@ -14,7 +14,6 @@ import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
 import org.apache.karaf.tooling.features.DependencyHelper;
 import org.apache.karaf.tooling.features.DependencyHelperFactory;
-import org.apache.karaf.tooling.url.CustomBundleURLStreamHandlerFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -22,6 +21,9 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
 
 public class FeaturesBuilder {
     private String m_name;
@@ -76,7 +78,13 @@ public class FeaturesBuilder {
                         throw new MojoExecutionException("No dependency resolver initialized!");
                     }
                     final Artifact repositoryArtifact = m_dependencyHelper.mvnToArtifact(repository);
-                    final File resolved = m_dependencyHelper.resolve(repositoryArtifact, m_log);
+                    final String groupId = repositoryArtifact.getGroupId();
+                    final String artifactId = repositoryArtifact.getArtifactId();
+                    final String classifier = repositoryArtifact.getClassifier();
+                    final String version = repositoryArtifact.getVersion();
+                    final ArtifactType type = new DefaultArtifactType(repositoryArtifact.getType());
+                    final DefaultArtifact a = new DefaultArtifact(groupId, artifactId, classifier, null, version, type);
+                    final File resolved = m_dependencyHelper.resolve(a, m_log);
                     stream = new FileInputStream(resolved);
                 } else if (repository.startsWith("file:")) {
                     stream = new URL(repository).openStream();

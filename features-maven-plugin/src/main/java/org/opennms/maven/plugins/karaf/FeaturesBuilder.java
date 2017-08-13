@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.karaf.features.internal.model.Feature;
 import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
+import org.apache.karaf.tooling.features.Dependency31Helper;
 import org.apache.karaf.tooling.features.DependencyHelper;
 import org.apache.karaf.tooling.features.DependencyHelperFactory;
 import org.apache.maven.artifact.Artifact;
@@ -21,9 +22,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
-import org.eclipse.aether.artifact.ArtifactType;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.artifact.DefaultArtifactType;
 
 public class FeaturesBuilder {
     private String m_name;
@@ -78,12 +76,7 @@ public class FeaturesBuilder {
                         throw new MojoExecutionException("No dependency resolver initialized!");
                     }
                     final Artifact repositoryArtifact = m_dependencyHelper.mvnToArtifact(repository);
-                    final String groupId = repositoryArtifact.getGroupId();
-                    final String artifactId = repositoryArtifact.getArtifactId();
-                    final String classifier = repositoryArtifact.getClassifier();
-                    final String version = repositoryArtifact.getVersion();
-                    final ArtifactType type = new DefaultArtifactType(repositoryArtifact.getType());
-                    final DefaultArtifact a = new DefaultArtifact(groupId, artifactId, classifier, null, version, type);
+                    final Object a = getArtifact(repositoryArtifact);
                     final File resolved = m_dependencyHelper.resolve(a, m_log);
                     stream = new FileInputStream(resolved);
                 } else if (repository.startsWith("file:")) {
@@ -118,6 +111,21 @@ public class FeaturesBuilder {
             m_repositories.add(repository);
         }
         return this;
+    }
+
+    protected Object getArtifact(final Artifact repositoryArtifact) {
+        final String groupId = repositoryArtifact.getGroupId();
+        final String artifactId = repositoryArtifact.getArtifactId();
+        final String classifier = repositoryArtifact.getClassifier();
+        final String version = repositoryArtifact.getVersion();
+
+        if (m_dependencyHelper instanceof Dependency31Helper) {
+            final org.eclipse.aether.artifact.ArtifactType type = new org.eclipse.aether.artifact.DefaultArtifactType(repositoryArtifact.getType());
+            return new org.eclipse.aether.artifact.DefaultArtifact(groupId, artifactId, classifier, null, version, type);
+        } else {
+            final org.sonatype.aether.artifact.ArtifactType type = new org.sonatype.aether.util.artifact.DefaultArtifactType(repositoryArtifact.getType());
+            return new org.sonatype.aether.util.artifact.DefaultArtifact(groupId, artifactId, classifier, null, version, type);
+        }
     }
 
     public FeaturesBuilder addFeature(final Feature feature) {

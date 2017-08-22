@@ -9,6 +9,10 @@
   <name>features-maven-plugin Maven Mojo</name>
   <url>http://maven.apache.org</url>
 
+  <prerequisites>
+    <maven>3.1.0</maven>
+  </prerequisites>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>  
@@ -126,16 +130,7 @@
       <artifactId>karaf-maven-plugin</artifactId>
       <version>3.0.8</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>org.apache.karaf.features.core</artifactId>
-      <version>3.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.utils</artifactId>
-      <version>1.4.0</version>
-    </dependency>
+    <!-- override pax-url-aether for some 2.5 bugfixes -->
     <dependency>
       <groupId>org.ops4j.pax.url</groupId>
       <artifactId>pax-url-aether</artifactId>

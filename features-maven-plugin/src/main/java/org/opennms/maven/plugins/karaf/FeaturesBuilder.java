@@ -14,7 +14,6 @@ import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
 import org.apache.karaf.tooling.features.Dependency31Helper;
 import org.apache.karaf.tooling.features.DependencyHelper;
-import org.apache.karaf.tooling.features.DependencyHelperFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -22,6 +21,10 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
 
 public class FeaturesBuilder {
     private String m_name;
@@ -34,12 +37,6 @@ public class FeaturesBuilder {
 
     protected DependencyHelper m_dependencyHelper;
 
-    /*
-    static {
-        URL.setURLStreamHandlerFactory(new CustomBundleURLStreamHandlerFactory());
-    }
-    */
-
     public FeaturesBuilder() {
     }
 
@@ -49,7 +46,14 @@ public class FeaturesBuilder {
 
     public FeaturesBuilder(final String name, final PlexusContainer container, final MavenProject project, final MavenSession session) throws MojoExecutionException {
         m_name = name;
-        m_dependencyHelper = DependencyHelperFactory.createDependencyHelper(container, project, session, m_log);
+        try {
+            final RepositorySystem system = container.lookup(RepositorySystem.class);
+            final Object s = MavenSession.class.getMethod("getRepositorySession").invoke(session);
+            final List<?> repositories = project.getRemoteProjectRepositories();
+            m_dependencyHelper = new Dependency31Helper(repositories, s, system);
+        } catch (final Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
     }
 
     public FeaturesBuilder setName(final String name) {
@@ -119,13 +123,8 @@ public class FeaturesBuilder {
         final String classifier = repositoryArtifact.getClassifier();
         final String version = repositoryArtifact.getVersion();
 
-        if (m_dependencyHelper instanceof Dependency31Helper) {
-            final org.eclipse.aether.artifact.ArtifactType type = new org.eclipse.aether.artifact.DefaultArtifactType(repositoryArtifact.getType());
-            return new org.eclipse.aether.artifact.DefaultArtifact(groupId, artifactId, classifier, null, version, type);
-        } else {
-            final org.sonatype.aether.artifact.ArtifactType type = new org.sonatype.aether.util.artifact.DefaultArtifactType(repositoryArtifact.getType());
-            return new org.sonatype.aether.util.artifact.DefaultArtifact(groupId, artifactId, classifier, null, version, type);
-        }
+        final ArtifactType type = new DefaultArtifactType(repositoryArtifact.getType());
+        return new DefaultArtifact(groupId, artifactId, classifier, null, version, type);
     }
 
     public FeaturesBuilder addFeature(final Feature feature) {

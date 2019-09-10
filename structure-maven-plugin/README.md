@@ -9,7 +9,7 @@ This plugins differs from others in that it does not follow transitive dependenc
 ## Usage
 
 ```
-mvn org.opennms.maven.plugins:structure-maven-plugin:1.0:structure
+mvn org.opennms.maven.plugins:structure-maven-plugin:1.0.1-SNAPSHOT:structure
 ``` 
 
 ## Example output

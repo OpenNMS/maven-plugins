@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.apache.maven.plugin.testing.MojoRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,7 +14,6 @@ public class StructureModuleTest {
     public MojoRule rule = new MojoRule();
 
     @Test
-    @Ignore
     public void canRenderGraph() throws Exception {
         File pom = new File( "target/test-classes/project-to-test/" );
         assertNotNull( pom );
@@ -23,6 +21,9 @@ public class StructureModuleTest {
 
         StructureMojo myMojo = (StructureMojo) rule.lookupConfiguredMojo( pom, "structure" );
         assertNotNull( myMojo );
+
+        rule.setVariableValueToObject( myMojo, "rootOnly", false);
+
         myMojo.execute();
 
         File outputDirectory = ( File ) rule.getVariableValueFromObject( myMojo, "outputDirectory" );

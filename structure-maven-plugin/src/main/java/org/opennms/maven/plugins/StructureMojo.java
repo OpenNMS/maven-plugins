@@ -33,13 +33,19 @@ public class StructureMojo extends AbstractMojo {
     @Parameter(defaultValue = "structure-graph.json")
     private String fileName;
 
+    /**
+     * Only execute in the root. Used for testing.
+     */
+    @Parameter(defaultValue = "true")
+    private boolean rootOnly;
+
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
     @Override
     public void execute() throws MojoExecutionException {
         // Only execute in the root
-        if (!project.isExecutionRoot()) {
+        if (rootOnly && !project.isExecutionRoot()) {
             return;
         }
 
@@ -52,6 +58,9 @@ public class StructureMojo extends AbstractMojo {
         final String json = gson.toJson(modules);
 
         // Write to file
+        if (!outputDirectory.mkdirs()) {
+            getLog().error("Failed to create output directory: " + outputDirectory);
+        }
         final Path path = Paths.get(outputDirectory.getAbsolutePath(), fileName);
         try {
             getLog().info(String.format("Writing graph to: %s", path));
@@ -65,8 +74,10 @@ public class StructureMojo extends AbstractMojo {
     private static List<StructureModule> toModules(MavenProject project) {
         final List<StructureModule> modules = new LinkedList<>();
         modules.add(new StructureModule((project)));
-        for (MavenProject child : project.getCollectedProjects()) {
-            modules.add(new StructureModule(child));
+        if (project.getCollectedProjects() != null) {
+            for (MavenProject child : project.getCollectedProjects()) {
+                modules.add(new StructureModule(child));
+            }
         }
         return modules;
     }

@@ -222,4 +222,34 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>opennms-repo</id>
+      <name>OpenNMS Repository</name>
+      <url>http://maven.opennms.org/content/groups/opennms.org-release</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>eclipse-repository</id>
+      <name>Eclipse</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>maven-restlet</id>
+      <name>Restlet</name>
+      <url>https://repo.spring.io/plugins-release/</url>
+    </repository>
+  </repositories>
 </project>
